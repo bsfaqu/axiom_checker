@@ -105,7 +105,9 @@ The arguments to supply to ```check.py``` are:
 | (Med)    | Med    |
 | (b5)    | b5    |
 
+---
 
+```axiom_checker``` is licensed under CC BY-SA 4.0.
 
 
 
