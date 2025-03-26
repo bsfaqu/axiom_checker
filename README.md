@@ -78,10 +78,10 @@ The arguments to supply to ```check.py``` are:
 | Axiom in manuscript    | check.py alias |
 | -------- | ------- |
 | (t0)  | t0    |
-| (t1) | t1    |
+| (t1) | t1 (checked by default) |
 | (t2s)    | t2s    |
 | (t2a)    | t2s    |
-| (t3)    | t3   |
+| (t3)    | t3 (checked by default)   |
 | (tr2)    | tr2    |
 | (b1_1)    | b1    |
 | (b1_2)    | b1    |
