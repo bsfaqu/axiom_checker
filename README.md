@@ -45,9 +45,9 @@ R(u,u)={u}, R(w,w)={w}, R(v,v)={u}, and the transit function of every other pair
 
 Note that the "x" in the u,u/v,v/w,w colums defaults to the transit set that is given by (t0).
 
-Furhermore, any field that is filled with "x" will default to include the transit set that corresponds to the shortest paths in G_R.
-If no such path exists in G_R, the transit function will be set to the empty set. For example, replacing the field that corresponds to
-R(u,v) with "x", and all the empty fields with "x" will yield the same transit function for the example above:
+Furthermore, any field that is filled with "x" will default to include the transit set that corresponds to the shortest paths in G_R.
+If no such path exists in G_R, the transit function of this pair is set to the empty set. For example, replacing the field that corresponds to
+R(u,v) with "x", and all the empty fields with "x", will yield the same transit function for the example above:
 
 
 ```
