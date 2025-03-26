@@ -75,4 +75,38 @@ The axioms that are supported as of now are exactly the axioms that appear in th
 The arguments to supply to ```check.py``` are:
 
 
+| Axiom in manuscript    | check.py alias |
+| -------- | ------- |
+| (t0)  | t0    |
+| (t1) | t1    |
+| (t2s)    | t2s    |
+| (t2a)    | t2s    |
+| (t3)    | t3   |
+| (tr2)    | tr2    |
+| (b1_1)    | b1    |
+| (b1_2)    | b1    |
+| (b2)    | b2   |
+| (b3_1)    | b3    |
+| (b3_2)    | b3    |
+| (b4)    | b4    |
+| (b6_1)    | b6    |
+| (b6_2)    | b6    |
+| (b6_3)    | b6    |
+| (j2)    | j2   |
+| (F)    | F    |
+| (G)    | G    |
+| (co0)    | co0    |
+| (co1)    | co1    |
+| (co2)    | co2    |
+| (co3)    | co3    |
+| (g)    | g    |
+| (p)    | p    |
+| (Mod)    | Mod    |
+| (Med)    | Med    |
+| (b5)    | b5    |
+
+
+
+
+
 
