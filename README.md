@@ -18,10 +18,10 @@ This script creates a tsv file for a chosen number of vertices. Call it with
 
 ```python make_tsv.py [vertices] [filename]```
 
-For example, to create an empty .tsv for a transit function of vertices u,v,w and save it to example.tsv:
+For example, creating an empty .tsv for a transit function on V={u,v,w} and saving it to example.tsv can be done with:
 ```python make_tsv.py u,v,w example.tsv```
 
-The script will output the following table that is also saved to example.tsv:
+The script then outputs the following table which is also saved to ```example.tsv```:
 ```
         u       v       w
 u       x       x       x
@@ -29,9 +29,9 @@ v       x       x       x
 w       x       x       x
 ```
 
-You can then use a text-editor or spreadsheet-editor of your choice to alter the transit function table.
-The columns of the .tsv are the first "argument" of the transit function, and the rows are the second
-"argument of the transit function. Consider the following .tsv:
+You can then use a text editor or spreadsheet editor of your choice to alter the transit function table.
+The rows of the .tsv are the first "argument" of the transit function, and the columns are the second
+"argument" of the transit function. Consider the following .tsv:
 
 
 ```
@@ -45,9 +45,9 @@ R(u,u)={u}, R(w,w)={w}, R(v,v)={u}, and the transit function of every other pair
 
 Note that the "x" in the u,u/v,v/w,w colums defaults to the transit set that is given by (t0).
 
-Furthermore, any field that is filled with "x" will default to include the transit set that corresponds to the shortest paths in G_R.
-If no such path exists in G_R, the transit function of this pair is set to the empty set. For example, replacing the field that corresponds to
-R(u,v) with "x", and all the empty fields with "x", will yield the same transit function for the example above:
+Furthermore, any other field that is filled with "x" will default to include the transit set that corresponds to the shortest paths in G_R. If no such path exists in G_R, the transit function of this pair is set to the empty set. Take care that fields contains no character (no space) for transit sets that are supposed to be empty to avoid them being defaulted to the vertices of shortest paths in G_R.
+
+For an example of utilizing "x" in the different fields, replacing the field that corresponds to R(u,v) with "x", and all the empty fields with "x", will yield the same transit function for the example above:
 
 
 ```
