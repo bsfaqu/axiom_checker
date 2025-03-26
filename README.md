@@ -9,16 +9,19 @@ Make sure to have a python 3.x installation with networkx installed. The network
 
 ## Usage
 
+The general workflow of using axiom_checker is to first generate a .tsv file template with ```make_tsv.py``` that allows you to define your transit function,
+and then to supply this file to ```check.py``` for axiom checking. In the following we outline how to use these individual scripts.
+
 ### make_csv.py
 
 This script creates a tsv file for a chosen number of vertices. Call it with
 
-```make_tsv.py [vertices] [filename]```
+```python make_tsv.py [vertices] [filename]```
 
 For example, to create an empty .tsv for a transit function of vertices u,v,w and save it to example.tsv:
-```make_tsv.py u,v,w example.tsv```
+```python make_tsv.py u,v,w example.tsv```
 
-The script will output the following table, that is also saved to example.tsv:
+The script will output the following table that is also saved to example.tsv:
 ```
         u       v       w
 u       x       x       x
@@ -26,9 +29,10 @@ v       x       x       x
 w       x       x       x
 ```
 
-You can then use a text-editor, or spreadsheet-editor of your choice to alter the transit function.
+You can then use a text-editor or spreadsheet-editor of your choice to alter the transit function table.
 The columns of the .tsv are the first "argument" of the transit function, and the rows are the second
 "argument of the transit function. Consider the following .tsv:
+
 
 ```
         u       v       w
@@ -41,6 +45,17 @@ R(u,u)={u}, R(w,w)={w}, R(v,v)={u}, and the transit function of every other pair
 
 Note that the "x" in the u,u/v,v/w,w colums defaults to the transit set that is given by (t0).
 
+Furhermore, any field that is filled with "x" will default to include the transit set that corresponds to the shortest paths in G_R.
+If no such path exists in G_R, the transit function will be set to the empty set. For example, replacing the field that corresponds to
+R(u,v) with "x", and all the empty fields with "x" will yield the same transit function for the example above:
+
+
+```
+        u       v       w
+u       x       x       u,w
+v       x       x       x
+w       x       w,v     x
+```
 
 
 ### check.py
@@ -48,5 +63,16 @@ Note that the "x" in the u,u/v,v/w,w colums defaults to the transit set that is 
 This script reads a supplied .tsv file and checks it for a selected set of axioms. 
 Call it with 
 
-```check.py [axioms] [filename]```.
+```python check.py [axioms] [filename]```.
+
+For example, checking the exampe above for axioms (b1), (b3), and (tr2) can be achieved by the following command:
+
+```python check.py b1,b3,tr2 example.tsv```.
+
+Take note that the axioms supplied as the second argument have to be separated by "," and cannot include spaces.
+
+The axioms that are supported as of now are exactly the axioms that appear in the manuscript "Directed Interval Transit Functions" [link to manuscript will be included once published].
+The arguments to supply to ```check.py``` are:
+
+
 
