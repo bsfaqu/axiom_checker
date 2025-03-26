@@ -368,6 +368,8 @@ class axioms:
                 x, elem(), r(u, v), nimplies(),
             )
             print("---")
+            return False
+        return True
 
     def co2(self, u, v, x, y):
         cond_0 = self.tf[(u, x)] == {u, x}
@@ -488,6 +490,8 @@ class axioms:
                   sstr(self.tf[(u, v)].intersection(self.tf[(u, w)]).intersection(self.tf[(w, v)])), neq(),
                   sstr({"x"}), "for some x")
             print("---")
+            return False
+        return True
 
     def mod(self, u, v, w):
         cond_0 = self.tf[(u, w)] != set() and self.tf[(w, v)] != set()
@@ -502,6 +506,8 @@ class axioms:
             print(self.R(u, w), neq(), emptyset(), aand(), self.R(w, v), neq(), emptyset(), nimplies(),
                   self.R(u, v), cap(), self.R(u, w), cap(), self.R(w, v), neq(), emptyset())
             print("---")
+            return False
+        return True
 
     def ta1(self, u, w, v):
         cond_0 = self.tf[(u, v)].intersection(self.tf[(u, w)]) == {u}
