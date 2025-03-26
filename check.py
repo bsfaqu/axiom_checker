@@ -418,12 +418,13 @@ if is_graphic:
     print("Given transit function is graphic, hence R=I_{G_R}.")
 # In the negative case also output the violating pairs
 else:
-    print("Given transit function is NOT graphic as R!=I_{G_R}.")
+    print("Given transit function is NOT graphic as R",neq(), "I_{G_R}.")
     print("Violating transit sets:")
     for k in graphic_violating_sets:
-        print(r(k[0], k[1]), eq(), sstr(transit_function[k]), neq(),
-              sstr(graphic_violating_sets[k]), eq(), "I_{G_R}(",
-              str(k[0]).replace("'", ""), str(k[1]).replace("'", ""), ")")
+        print(r(k[0], k[1]), " ", eq(), " ", sstr(transit_function[k]), " ", neq(), " ",
+              sstr(graphic_violating_sets[k]), " ", eq(), " I(",
+              str(k[0]).replace("'", ""), ",", str(k[1]).replace("'", ""), ")", sep="")
+    print()
 
 
 # Drawing graph figure and saving it
