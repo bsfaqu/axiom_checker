@@ -6,6 +6,32 @@ import copy
 import matplotlib.pyplot as plt
 from math_strings import *
 
+for arg in argv:
+    if arg in ["-h", "--help", "--manual"]:
+        help = True
+        axiom_strings = [
+            "t0", "t1", "t2s", "t2a", "t3",
+            "tr2", "b1", "b2", "b3", "b4",
+            "b6", "j2", "F", "G", "co0",
+            "co1", "co2", "co3", "g", "p",
+            "mod", "med", "b5"
+        ]
+        print()
+        print("Call check.py with:")
+        print("python check.py [axioms] [filename]")
+        print("[axioms] should by axiom strings, comma separated, i.e. 'b1,b5,tr2'")
+        print("Please do not include any spaces.")
+        print()
+        print("Supported Axioms:")
+        for a in axiom_strings:
+            # print("Select with '", a, "'.")
+            print_axiom_info(a)
+            print()
+        print()
+        print("Select axioms with:", sstr(axiom_strings))
+        print()
+        sys.exit()
+
 # Parse command-line arguments.
 ax_choice = argv[1].split(",")
 csv_file = argv[2]

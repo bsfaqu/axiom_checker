@@ -80,9 +80,12 @@ class axioms:
         ret_dic = {}
 
         if (cond_0 and cond_1) and not impl_0:
+            print("VIOLATE (b3_2)")
             print("u ->", u, ", x ->", x, ", y ->", y, ", v ->", v)
-            print(x, "in", "R", (u, v), "and", y, "in", "R", (x, v), "notimply", x, "in", "R", (u, y))
-            print("VIOLATE (b3_2): ", x, "notin R", (u, y), "| R", (u, y), "=", self.tf[(u, y)])
+            print(x, elem(), r(u, v), aand(), y, elem(), r(x, v), nimplies(),
+                  x, elem(), r(u, y))
+            print(x, elem(), self.R(u, v), aand(), y, elem(), self.R(x, v), nimplies(),
+                  x, elem(), self.R(u, y))
             ret_dic[(u, y)] = self.tf[(u, y)].union({x})
             print("---")
             return False
@@ -366,6 +369,15 @@ class axioms:
                 r(u, x), eq(), sstr({u, x}), aand(),
                 r(x, v), eq(), sstr({x, v}), aand(),
                 x, elem(), r(u, v), nimplies(),
+                r(x, u), eq(), sstr({x, u}), oor(),
+                r(v, x), eq(), sstr({v, x})
+            )
+            print(
+                self.R(u, x), eq(), sstr({u, x}), aand(),
+                self.R(x, v), eq(), sstr({x, v}), aand(),
+                x, elem(), self.R(u, v), nimplies(),
+                self.R(x, u), eq(), sstr({x, u}), oor(),
+                self.R(v, x), eq(), sstr({v, x})
             )
             print("---")
             return False
