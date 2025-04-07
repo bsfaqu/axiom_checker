@@ -105,6 +105,8 @@ The arguments to supply to ```check.py``` are:
 | (Med)    | Med    |
 | (b5)    | b5    |
 
+Besides outputting violations of the chosen axioms, and validating if the supplied transit function is graphic, ```axiom_checker``` also constructs the graph G_R and saves it as a figure. The figure of G_R is saved under the same name as the supplied .tsv, but with a .png file extention.
+
 ---
 
 ```axiom_checker``` is licensed under CC BY-SA 4.0.
