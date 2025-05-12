@@ -190,6 +190,9 @@ class transit_function:
 
         self.vertices = vertices
 
+    def R(self, u, v):
+        return sstr(self.transit_function[(u, v)])
+
     def check_axioms(self, ax_choice):
 
         # TODO Change namespace to .self for vertices

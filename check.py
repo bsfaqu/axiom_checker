@@ -20,6 +20,8 @@ axiom_strings_stepfunctions = [
 signpost = False
 
 for arg in argv:
+
+    # Print help string and exit if help argument was supplied
     if arg in ["-h", "--help", "--manual"]:
         print()
         print("Call check.py with:")
