@@ -195,6 +195,15 @@ class transit_function:
 
     def check_axioms(self, ax_choice):
 
+        # Potential strings to pick axioms:
+        # axiom_strings_transit = [
+        #     "t0", "t1", "t2s", "t2a", "t3",
+        #     "tr2", "b1", "b2", "b3", "b4",
+        #     "b6", "j2", "F", "G", "co0",
+        #     "co1", "co2", "co3", "g", "p",
+        #     "mod", "med", "b5"
+        # ]
+
         # TODO Change namespace to .self for vertices
         vertices = self.vertices
 
