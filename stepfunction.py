@@ -1,0 +1,177 @@
+
+
+class stepfunction:
+
+    stepfunction_set = set()
+    stepfunction_dict = {}
+    graph = None
+    vertices = None
+    axioms = None
+
+    def __init__(self, csv_lines):
+        # Parse vertices from the first line
+        vertices = csv_lines[0].split("\t")[1::]
+
+        # Remove the first line (only contains vertices)
+        csv_lines = csv_lines[1::]
+
+        # Here we save all the transit sets. Keys are tuples (u,v) and values are sets.
+        stepfunction_dict = {}
+
+        # Transit sets that are always supposed to be empty, i.e fields filled
+        # with "", hence no string
+        ignore_tuples = []
+
+        # Initialize transit sets as empty and ensure (t3)
+        for u in vertices:
+            for v in vertices:
+                stepfunction_dict[(u, v)] = set()
+
+                # Enforce (t3)
+                if u == v:
+                    stepfunction_dict[(u, v)] = {u}
+
+        # Parse all the transit sets supplied in the .tsv
+        for line in csv_lines:
+
+            # Last line
+            if line == "":
+                continue
+
+            # Split line by tabulators. First field is always the source.
+            line = line.split("\t")
+            source = line[0]
+
+            # Split line by tabulator. Now every list entry in the line
+            # is lined up with the vertices in vertices.
+            line = line[1::]
+
+            # Iterate over line and fill the transit function.
+            for i in range(len(line)):
+
+                # This is ensured by (t3) already, or this will be
+                # substituted with the shortest path(s) in G_R later.
+                if line[i] == "x":
+                    continue
+
+                # ignore line, hence this step set is kept empty
+                elif line[i] == "":
+                    target = vertices[i]
+
+                    # Keep track of purposefully emptpy sets
+                    ignore_tuples += [(source, target)]
+                else:
+                    # Set transit sets in transit_function. R(u,u) entries are ignored.
+                    target = vertices[i]
+                    if source == target:
+                        continue
+                    else:
+                        transit_list = line[i].split(",")
+                        stepfunction_dict[(source, target)] = set(transit_list)
+
+        stepfunction_set = self.step_dic_to_set(stepfunction_dict)
+
+        # Output supplied stepfunction
+        print("\n---\n")
+        print("*** Stepfunction before step-adding ***")
+
+        counter = 0
+
+        for t in stepfunction_set:
+            print(t)
+
+        # Save the original transit function
+        orig_stepfunction_dict = copy.copy(stepfunction_dict)
+
+        # Initialize NetworkX graph object to obtain shortest paths later
+        graph = nx.DiGraph()
+
+        # Add all the vertices
+        for vert in vertices:
+            graph.add_node(vert)
+
+        # Add edges to graph if tuple is (u, v, v).
+        for t in stepfunction_set:
+            if t[1] == t[2]:
+                graph.add_edge(t[1], t[2])
+
+        # Output edges of G_R
+        print("\n---\n")
+        print("*** Constructed edges ***")
+        print(sstr(list(graph.edges())).replace("'", ""))
+
+        # Keep track of added paths
+        added_paths = []
+
+        for k in stepfunction_dict:
+            # If the step triple is supposed to be empty
+            if k in ignore_tuples or k[0] == k[1]:
+                continue
+
+            # Get all the shortest paths with nx
+            try:
+                paths = list(nx.all_shortest_paths(graph, source=k[0], target=k[1]))
+            except nx.NetworkXNoPath:
+                continue
+
+            # Is there only one path
+            if len(paths) == 1:
+                # Does the path only contain one vertex (u = v), continue.
+                if len(paths[0]) == 1:
+                    continue
+                # Does the path contain two vertices (edge must be defined as such already), continue
+                if len(paths[0]) == 2:
+                    continue
+
+            # If the transit set for this tuple is not set yet (not supplied by user)
+            if stepfunction_dict[k] == set():
+                t_set = set()
+
+                # Collecting all the first vertices along all shortest paths in t_set
+                for p in paths:
+                    t_set = t_set.union(set([p[1]]))
+                    added_paths += [k]
+
+                # Set the transit set of current tuple to t_set
+                stepfunction_dict[k] = t_set
+            else:
+                pass
+
+        # Output the transit function after adding the shortest paths in G_R
+        print("\n---\n")
+        print("*** Step Function after step-adding ***")
+
+        # output the added paths
+        for t in added_paths:
+            print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
+
+        if len(added_paths) > 0:
+            print()
+
+        # Provide a structured output of the transit function
+        counter = 0
+        for k in stepfunction_dict:
+            if counter % len(vertices) == 0 and counter != 0:
+                print("-")
+            print(r(k[0], k[1]), eq(), sstr(stepfunction_dict[k]))
+            counter += 1
+
+        # Store transit function in class variable
+        self.stepfunction_dict = stepfunction_dict
+
+        # Initialize axioms with transit function and save in class variable
+        self.axioms = axioms(self.transit_function)
+
+        # Save digraph to class variable
+        self.graph = graph
+
+        self.vertices = vertices
+
+    def step_dic_to_set(stepfunction_dic):
+        stepfunction_set = []
+
+        for k in stepfunction_dic.keys():
+            for s in stepfunction_dic[k]:
+                stepfunction_set += [(k[0], k[1], s)]
+
+        return stepfunction_set
