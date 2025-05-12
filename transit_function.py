@@ -13,6 +13,8 @@ class transit_function:
     graph = None
     vertices = None
 
+    # TODO add optional output (print_info = True or sth similar)
+
     def __init__(self, csv_lines):
         # Parse vertices from the first line
         vertices = csv_lines[0].split("\t")[1::]
