@@ -115,17 +115,6 @@ print("*** Axiom checking ***")
 choice_string = str(ax_choice).replace("[", "").replace("]", "").replace("'","")
 print("Checking the following axioms:", ax_choice, "\n")
 
-
-# Initialize dictionary to save which axioms are satisfied
-sat_axioms = dict()
-for a in ax_choice:
-    if a in ["b1", "b2"]:
-        sat_axioms[a] = [True, True]
-    elif a in ["b6"]:
-        sat_axioms[a] = [True, True, True]
-    else:
-        sat_axioms[a] = True
-
 check_object.check_axioms(ax_choice)
 
 check_object.check_graphic()
