@@ -1,4 +1,7 @@
-
+import networkx as nx
+import copy
+from math_strings import *
+from sf_axioms import axioms
 
 class stepfunction:
 
@@ -27,9 +30,9 @@ class stepfunction:
             for v in vertices:
                 stepfunction_dict[(u, v)] = set()
 
-                # Enforce (t3)
-                if u == v:
-                    stepfunction_dict[(u, v)] = {u}
+                # # Enforce (t3)
+                # if u == v:
+                #     stepfunction_dict[(u, v)] = {u}
 
         # Parse all the transit sets supplied in the .tsv
         for line in csv_lines:
@@ -51,7 +54,7 @@ class stepfunction:
 
                 # This is ensured by (t3) already, or this will be
                 # substituted with the shortest path(s) in G_R later.
-                if line[i] == "x":
+                if line[i] == "*":
                     continue
 
                 # ignore line, hence this step set is kept empty
@@ -78,7 +81,7 @@ class stepfunction:
         counter = 0
 
         for t in stepfunction_set:
-            print(t)
+            print(tstr(t))
 
         # Save the original transit function
         orig_stepfunction_dict = copy.copy(stepfunction_dict)
@@ -93,7 +96,7 @@ class stepfunction:
         # Add edges to graph if tuple is (u, v, v).
         for t in stepfunction_set:
             if t[1] == t[2]:
-                graph.add_edge(t[1], t[2])
+                graph.add_edge(t[0], t[1])
 
         # Output edges of G_R
         print("\n---\n")
@@ -137,16 +140,16 @@ class stepfunction:
             else:
                 pass
 
-        # Output the transit function after adding the shortest paths in G_R
-        print("\n---\n")
-        print("*** Step Function after step-adding ***")
-
         # output the added paths
         for t in added_paths:
             print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
 
         if len(added_paths) > 0:
             print()
+
+        # Output the transit function after adding the shortest paths in G_R
+        print("\n---\n")
+        print("*** Step Function after step-adding (as transit function) ***")
 
         # Provide a structured output of the transit function
         counter = 0
@@ -156,11 +159,21 @@ class stepfunction:
             print(r(k[0], k[1]), eq(), sstr(stepfunction_dict[k]))
             counter += 1
 
-        # Store transit function in class variable
+        print("\n---\n")
+        print("*** Step Function after step-adding (as set) ***")
+
+        stepfunction_set = self.step_dic_to_set(stepfunction_dict)
+        for t in stepfunction_set:
+            print(tstr(t))
+
+        # Store stetpfunction dict in class variable
         self.stepfunction_dict = stepfunction_dict
 
+        # Store stepfunction set in class variable
+        self.stepfunction_set = stepfunction_set
+
         # Initialize axioms with transit function and save in class variable
-        self.axioms = axioms(self.transit_function)
+        self.axioms = axioms(self.stepfunction_set)
 
         # Save digraph to class variable
         self.graph = graph

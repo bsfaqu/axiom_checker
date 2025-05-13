@@ -72,6 +72,13 @@ def sstr(A):
     set_string += "}"
     return set_string
 
+def tstr(t):
+    tuple_string = "("
+    for e in t:
+        tuple_string += str(e) + ", "
+    tuple_string = tuple_string[0:-2] + ")"
+    return tuple_string
+
 
 # and string
 def aand():

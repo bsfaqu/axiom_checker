@@ -15,7 +15,7 @@ tsv_str += "\n"
 for i in range(vertices):
     tsv_str += vertices_list[i] + "\t"
     for j in range(vertices):
-        tsv_str += "x" + "\t"
+        tsv_str += "*" + "\t"
     tsv_str = tsv_str[0:-1]
     tsv_str += "\n"
 

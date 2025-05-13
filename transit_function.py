@@ -58,7 +58,7 @@ class transit_function:
 
                 # This is ensured by (t3) already, or this will be
                 # substituted with the shortest path(s) in G_R later.
-                if line[i] == "x":
+                if line[i] == "*":
                     continue
 
                 # ignore line, hence this transit set is kept empty
