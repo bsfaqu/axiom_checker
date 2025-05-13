@@ -117,19 +117,18 @@ print()
 print("*** VERTICES ***")
 print(sstr(vertices))
 
-if not signpost:
-    check_object = transit_function.transit_function(csv_lines)
-elif signpost:
+if signpost:
     check_object = stepfunction.stepfunction(csv_lines)
-    sys.exit()
+else:
+    check_object = transit_function.transit_function(csv_lines)
 
 # Axiom checking output
 print("\n---\n")
 print("*** Axiom checking ***")
 
 # Output which axioms are checked
-choice_string = str(ax_choice).replace("[", "").replace("]", "").replace("'","")
-print("Checking the following axioms:", ax_choice, "\n")
+choice_string = str(ax_choice).replace("[", "").replace("]", "").replace("'", "")
+print("Checking the following axioms:", choice_string, "\n")
 
 check_object.check_axioms(ax_choice)
 

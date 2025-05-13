@@ -2,6 +2,7 @@ import networkx as nx
 import copy
 from math_strings import *
 from sf_axioms import axioms
+from matplotlib import pyplot as plt
 
 class stepfunction:
 
@@ -87,7 +88,7 @@ class stepfunction:
         orig_stepfunction_dict = copy.copy(stepfunction_dict)
 
         # Initialize NetworkX graph object to obtain shortest paths later
-        graph = nx.DiGraph()
+        graph = nx.Graph()
 
         # Add all the vertices
         for vert in vertices:
@@ -122,9 +123,9 @@ class stepfunction:
                 # Does the path only contain one vertex (u = v), continue.
                 if len(paths[0]) == 1:
                     continue
-                # Does the path contain two vertices (edge must be defined as such already), continue
-                if len(paths[0]) == 2:
-                    continue
+                # # Does the path contain two vertices (edge must be defined as such already), continue
+                # if len(paths[0]) == 2:
+                #     continue
 
             # If the transit set for this tuple is not set yet (not supplied by user)
             if stepfunction_dict[k] == set():
@@ -132,7 +133,7 @@ class stepfunction:
 
                 # Collecting all the first vertices along all shortest paths in t_set
                 for p in paths:
-                    t_set = t_set.union(set([p[1]]))
+                    t_set = t_set.union({p[1]})
                     added_paths += [k]
 
                 # Set the transit set of current tuple to t_set
@@ -185,6 +186,28 @@ class stepfunction:
 
         for k in stepfunction_dic.keys():
             for s in stepfunction_dic[k]:
-                stepfunction_set += [(k[0], k[1], s)]
+                stepfunction_set += [(k[0], s, k[1])]
 
         return stepfunction_set
+
+    def check_axioms(self, ax_choice):
+        if "A" in ax_choice:
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        self.axioms.A(u, v, x)
+
+        if "B" in ax_choice:
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        self.axioms.B(u, v, x)
+
+    def check_graphic(self):
+        pass
+
+    def save_graph(self, csv_file):
+        # Drawing graph figure and saving it
+        nx.draw(self.graph, with_labels=True)
+        plt.savefig(csv_file.split(".")[0] + ".png")
+        print("\nG_R saved as", csv_file.split(".")[0] + ".png", "in working directory.\n")

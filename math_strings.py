@@ -79,6 +79,12 @@ def tstr(t):
     tuple_string = tuple_string[0:-2] + ")"
     return tuple_string
 
+def tp(u, v, w):
+    return tstr((u, v, w))
+
+def T():
+    return "T"
+
 
 # and string
 def aand():
