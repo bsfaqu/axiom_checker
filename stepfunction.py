@@ -167,7 +167,7 @@ class stepfunction:
 
         self.vertices = vertices
 
-    def step_dic_to_set(stepfunction_dic):
+    def step_dic_to_set(self, stepfunction_dic):
         stepfunction_set = []
 
         for k in stepfunction_dic.keys():

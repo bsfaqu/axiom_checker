@@ -2,6 +2,7 @@ from sys import argv
 import sys
 from math_strings import *
 import transit_function
+import stepfunction
 
 axiom_strings_transit = [
             "t0", "t1", "t2s", "t2a", "t3",
@@ -18,6 +19,9 @@ axiom_strings_stepfunctions = [
 ]
 
 signpost = False
+csv_file = ""
+ax_choice = []
+wrong_file_choice = False
 
 for arg in argv:
 
@@ -56,6 +60,15 @@ for arg in argv:
             csv_file = argv[argv.index(arg) + 1]
         except:
             wrong_file_choice = True
+
+if wrong_file_choice or csv_file == "":
+    print("Something is wrong with the input file. Make sure to include the -f [filename] arguments.")
+    print("Exiting...")
+
+if ax_choice == []:
+    print("No axioms supplied. Exiting...")
+
+
 
 # Check if the axioms supplied are actually supported for signposts and exit otherwise
 if signpost:
@@ -106,6 +119,9 @@ print(sstr(vertices))
 
 if not signpost:
     check_object = transit_function.transit_function(csv_lines)
+elif signpost:
+    check_object = stepfunction.stepfunction(csv_lines)
+    sys.exit()
 
 # Axiom checking output
 print("\n---\n")
