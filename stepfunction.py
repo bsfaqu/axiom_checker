@@ -191,17 +191,154 @@ class stepfunction:
         return stepfunction_set
 
     def check_axioms(self, ax_choice):
+        # axiom_strings_stepfunctions = [
+        #     "A", "B", "H", "C", "D", "F", "G", "E",
+        #     "Pt", "Dd", "Dt", "Cw", "Cb", "Dm", "T1",
+        #     "T2", "Tb2", "P4"
+        # ]
+
         if "A" in ax_choice:
+            print("Check (A)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
                         self.axioms.A(u, v, x)
 
         if "B" in ax_choice:
+            print("Check (B)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
                         self.axioms.B(u, v, x)
+
+        if "H" in ax_choice:
+            print("Check (H)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    self.axioms.H(u, v)
+
+        if "C" in ax_choice:
+            print("Check (C)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.C(u, v, x, y)
+
+        if "D" in ax_choice:
+            print("Check (D)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.D(u, v, x, y)
+
+        if "F" in ax_choice:
+            print("Check (F)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.F(u, v, x, y)
+
+        if "G" in ax_choice:
+            print("Check (G)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.G(u, v, x, y)
+
+        if "E" in ax_choice:
+            print("Check (E)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.E(u, v, x, y)
+
+        if "Pt" in ax_choice:
+            print("Check (Pt)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.Pt(u, v, x, y)
+
+        if "Dd" in ax_choice:
+            print("Check (Dd)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for w in self.vertices:
+                        for x in self.vertices:
+                            for y in self.vertices:
+                                for z in self.vertices:
+                                    for d in self.vertices:
+                                        self.axioms.Dd(u, v, w, x, y, z, d)
+
+        if "Dt" in ax_choice:
+            print("Check (Dt)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            for z in self.vertices:
+                                self.axioms.Dt(u, v, x, y, z)
+
+        if "Cw" in ax_choice:
+            print("Check (Cw)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.Cw(u, v, x, y)
+
+        if "Cb" in ax_choice:
+            print("Check (Cb)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for w in self.vertices:
+                        for x in self.vertices:
+                            for y in self.vertices:
+                                self.axioms.Cb(u, v, w, x, y)
+
+        if "Dm" in ax_choice:
+            print("Check (Dm)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.Dm(u, v, x, y)
+
+        if "T1" in ax_choice:
+            print("Check (T1)...\n")
+            for x in self.vertices:
+                for y in self.vertices:
+                    for t in self.vertices:
+                        self.axioms.T1(x, y, t)
+
+        if "T2" in ax_choice:
+            print("Check (T2)...\n")
+            for x in self.vertices:
+                for y in self.vertices:
+                    for z in self.vertices:
+                        self.axioms.T2(x, y, z)
+
+        if "Tb2" in ax_choice:
+            print("Check (Tb2)...\n")
+            for x in self.vertices:
+                for y in self.vertices:
+                    for z in self.vertices:
+                        self.axioms.Tb2(x, y, z, self.vertices)
+
+        if "P4" in ax_choice:
+            print("Check (P4)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for x in self.vertices:
+                        for y in self.vertices:
+                            self.axioms.P4(u, v, x, y)
+
 
     def check_graphic(self):
         pass
