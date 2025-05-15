@@ -15,7 +15,7 @@ axiom_strings_transit = [
 axiom_strings_stepfunctions = [
     "A", "B", "H", "C", "D", "F", "G", "E",
     "Pt", "Dd", "Dt", "Cw", "Cb", "Dm", "T1",
-    "T2", "Tb2", "P4"
+    "T2", "Tb2", "P4", "Sm"
 ]
 
 signpost = False

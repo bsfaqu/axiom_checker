@@ -67,11 +67,11 @@ class stepfunction:
                 else:
                     # Set transit sets in transit_function. R(u,u) entries are ignored.
                     target = vertices[i]
-                    if source == target:
-                        continue
-                    else:
-                        transit_list = line[i].split(",")
-                        stepfunction_dict[(source, target)] = set(transit_list)
+                    # if source == target:
+                    #     continue
+                    # else:
+                    transit_list = line[i].split(",")
+                    stepfunction_dict[(source, target)] = set(transit_list)
 
         stepfunction_set = self.step_dic_to_set(stepfunction_dict)
 
@@ -338,6 +338,16 @@ class stepfunction:
                     for x in self.vertices:
                         for y in self.vertices:
                             self.axioms.P4(u, v, x, y)
+
+        if "Sm" in ax_choice:
+            print("Check (Sm)...\n")
+            for u in self.vertices:
+                for v in self.vertices:
+                    for w in self.vertices:
+                        for x in self.vertices:
+                            for y in self.vertices:
+                                for z in self.vertices:
+                                    self.axioms.Sm(u, v, w, x, y, z)
 
 
     def check_graphic(self):

@@ -76,7 +76,7 @@ class axioms:
         cond_0 = (u, v, x) in self.stepfunction_set
         cond_1 = (x, y, v) in self.stepfunction_set
 
-        impl_0 = (x, y, v) in self.stepfunction_set
+        impl_0 = (x, y, u) in self.stepfunction_set
 
         if (cond_0 and cond_1) and not impl_0:
             print("VIOLATE (C)")
@@ -379,3 +379,25 @@ class axioms:
             print("---")
             return False
         return True
+
+    def Sm(self, u, v, w, x, y, z):
+        #         (v, w, x) in T, (v, w, z) in T, (x, y, z) in T
+        #         implies (v, w, y) in T
+        cond_0 = (v, w, x) in self.stepfunction_set
+        cond_1 = (v, w, z) in self.stepfunction_set
+        cond_2 = (x, y, z) in self.stepfunction_set
+
+        impl_0 = (v, w, y) in self.stepfunction_set
+
+        if (cond_0 and cond_1 and cond_2) and not (impl_0):
+            print("VIOLATE (Sm)")
+            print("u ", "->", u, ", v", "->", v, ", w", "->", w, ", x", "->", x, ", y", "->", y, ", z", "->", z)
+            print(tp(v, w, x), elem(), T(), aand(), tp(v, w, z), elem(), T(), aand(), tp(x, y, z), elem(), T(),
+                  nimplies(), tp(v, w, y), elem(), T())
+            print("---")
+            return False
+        return True
+
+
+
+
