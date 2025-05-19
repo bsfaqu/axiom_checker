@@ -4,6 +4,7 @@ from math_strings import *
 import transit_function
 import stepfunction
 
+# TODO GENERATE CONNECTED,CHORDAL GRAPH, Check for Smooth axiom (3-Fan-Free then its Ptolemaic)
 axiom_strings_transit = [
             "t0", "t1", "t2s", "t2a", "t3",
             "tr2", "b1", "b2", "b3", "b4",
