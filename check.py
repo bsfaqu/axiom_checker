@@ -33,17 +33,30 @@ for arg in argv:
         print("python check.py -a [axioms] -f [filename]")
         print("or")
         print("python check.py --axioms [axioms] --file [filename]")
-        print("[axioms] should by axiom strings, comma separated, i.e. 'b1,b5,tr2'")
+        print("[axioms] should be axiom strings, comma separated, i.e. 'b1,b5,tr2'")
         print("Please do not include any spaces in the axiom string.")
         print("Stepsystems can be checked by including a -s argument, e.g. ")
         print("python check.py -s -a [axioms] -f [filename]")
         print()
+        print("Visualization of G_R/G_T will be saved under the same name as the input file with a .png extension.")
+        print()
+
         print("Supported Axioms (Transit Functions):")
         for a in axiom_strings_transit:
-            print_axiom_info(a)
+            print_axiom_info_tf(a)
             print()
+
         print()
-        print("Select axioms with:", sstr(axiom_strings_transit))
+
+        print("Supported Axioms (Step functions):")
+        for a in axiom_strings_stepfunctions:
+            print_axiom_info_sf(a)
+            print()
+
+        print()
+        print("Select (transit function) axioms with:", sstr(axiom_strings_transit))
+        print()
+        print("Select (step function) axioms with:", sstr(axiom_strings_stepfunctions))
         print()
         sys.exit()
 
