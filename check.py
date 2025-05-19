@@ -146,6 +146,6 @@ print("Checking the following axioms:", choice_string, "\n")
 
 check_object.check_axioms(ax_choice)
 
-check_object.check_graphic()
+check_object.check_additional()
 
 check_object.save_graph(csv_file)

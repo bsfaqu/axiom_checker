@@ -396,7 +396,7 @@ class transit_function:
                             else:
                                 sat_val = self.axioms.rv(u, x, y, v)
 
-    def check_graphic(self):
+    def check_additional(self):
 
         # Initialize some vars for graphic check
         is_graphic = True
@@ -434,7 +434,7 @@ class transit_function:
                 print(r(k[0], k[1]), " ", eq(), " ", sstr(self.transit_function[k]), " ", neq(), " ",
                       sstr(graphic_violating_sets[k]), " ", eq(), " I(",
                       str(k[0]).replace("'", ""), ",", str(k[1]).replace("'", ""), ")", sep="")
-            print()
+        print()
 
     def get_transit_function(self):
         return self.transit_function

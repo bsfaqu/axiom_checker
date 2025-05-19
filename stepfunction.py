@@ -3,6 +3,7 @@ import copy
 from math_strings import *
 from sf_axioms import axioms
 from matplotlib import pyplot as plt
+from graph_tools import *
 
 class stepfunction:
 
@@ -188,7 +189,7 @@ class stepfunction:
             for s in stepfunction_dic[k]:
                 stepfunction_set += [(k[0], s, k[1])]
 
-        return stepfunction_set
+        return set(stepfunction_set)
 
     def check_axioms(self, ax_choice):
         # axiom_strings_stepfunctions = [
@@ -350,8 +351,37 @@ class stepfunction:
                                     self.axioms.Sm(u, v, w, x, y, z)
 
 
-    def check_graphic(self):
-        pass
+    def check_additional(self):
+        test_stepfunction = graph_to_step(self.graph)
+
+        t_in_graph_not_in_sf = []
+        t_in_sf_not_in_graph = []
+
+        for t in test_stepfunction:
+            if t not in self.stepfunction_set:
+                t_in_graph_not_in_sf += [t]
+
+        for t in self.stepfunction_set:
+            if t not in test_stepfunction:
+                t_in_sf_not_in_graph += [t]
+
+        if len(t_in_graph_not_in_sf) == 0 and len(t_in_sf_not_in_graph) == 0:
+            print("The step system of G_T is equal to the step function provided.")
+        else:
+            print("The step system of G_T differs from the step function provided.")
+
+            print()
+            print("Triples derived from G_T that are not in T:")
+
+            for t in t_in_graph_not_in_sf:
+                print(t)
+
+            print()
+            print("Triples in T that cannot be derived from G_T:")
+
+            for t in t_in_sf_not_in_graph:
+                print(t)
+
 
     def save_graph(self, csv_file):
         # Drawing graph figure and saving it
