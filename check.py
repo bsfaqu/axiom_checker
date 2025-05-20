@@ -10,7 +10,7 @@ axiom_strings_transit = [
             "tr2", "b1", "b2", "b3", "b4",
             "b6", "j2", "F", "G", "co0",
             "co1", "co2", "co3", "g", "p",
-            "mod", "med", "b5"
+            "mod", "med", "b5", "rv", "ta"
         ]
 
 axiom_strings_stepfunctions = [

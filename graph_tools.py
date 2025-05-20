@@ -1,4 +1,7 @@
+import matplotlib.pyplot as plt
 import networkx as nx
+
+# TODO Include vertices in the functions?
 
 def graph_to_step(graph):
 
@@ -39,7 +42,7 @@ def graph_to_transit(graph):
                 continue
 
             for p in paths:
-                transit_function[(u, v)] = transit_function[(u, v)].union(set(path))
+                transit_function[(u, v)] = transit_function[(u, v)].union(set(p))
 
     return transit_function
 
@@ -51,7 +54,7 @@ def step_to_graph(stepfunction_set):
 
     for t in stepfunction_set:
         for e in t:
-            vertices.update(e)
+            vertices.update([e])
 
     for v in vertices:
         graph.add_node(v)
@@ -69,9 +72,15 @@ def transit_to_graph(transit_function):
     vertices = set()
 
     for k in transit_function.keys():
-        vertices.update(k[0])
-        vertices.update(k[1])
+        vertices.update([k[0]])
+        vertices.update([k[1]])
 
     for k in transit_function.keys():
         if transit_function[k] == {k[0], k[1]}:
             graph.add_edge(k[0], k[1])
+
+def save_graph(graph, outfile):
+    nx.draw(graph, with_labels=True)
+    plt.savefig(outfile)
+    plt.close()
+    print("Saved graph to", outfile)

@@ -13,174 +13,198 @@ class stepfunction:
     vertices = None
     axioms = None
 
-    def __init__(self, csv_lines):
-        # Parse vertices from the first line
-        vertices = csv_lines[0].split("\t")[1::]
+    def __init__(self, csv_lines=None, stepfunction_set=None, vertices=None):
 
-        # Remove the first line (only contains vertices)
-        csv_lines = csv_lines[1::]
+        if csv_lines != None:
+            # Parse vertices from the first line
+            vertices = csv_lines[0].split("\t")[1::]
 
-        # Here we save all the transit sets. Keys are tuples (u,v) and values are sets.
-        stepfunction_dict = {}
+            # Remove the first line (only contains vertices)
+            csv_lines = csv_lines[1::]
 
-        # Transit sets that are always supposed to be empty, i.e fields filled
-        # with "", hence no string
-        ignore_tuples = []
+            # Here we save all the transit sets. Keys are tuples (u,v) and values are sets.
+            stepfunction_dict = {}
 
-        # Initialize transit sets as empty and ensure (t3)
-        for u in vertices:
-            for v in vertices:
-                stepfunction_dict[(u, v)] = set()
+            # Transit sets that are always supposed to be empty, i.e fields filled
+            # with "", hence no string
+            ignore_tuples = []
 
-                # # Enforce (t3)
-                # if u == v:
-                #     stepfunction_dict[(u, v)] = {u}
+            # Initialize transit sets as empty and ensure (t3)
+            for u in vertices:
+                for v in vertices:
+                    stepfunction_dict[(u, v)] = set()
 
-        # Parse all the transit sets supplied in the .tsv
-        for line in csv_lines:
+                    # # Enforce (t3)
+                    # if u == v:
+                    #     stepfunction_dict[(u, v)] = {u}
 
-            # Last line
-            if line == "":
-                continue
+            # Parse all the transit sets supplied in the .tsv
+            for line in csv_lines:
 
-            # Split line by tabulators. First field is always the source.
-            line = line.split("\t")
-            source = line[0]
-
-            # Split line by tabulator. Now every list entry in the line
-            # is lined up with the vertices in vertices.
-            line = line[1::]
-
-            # Iterate over line and fill the transit function.
-            for i in range(len(line)):
-
-                # This is ensured by (t3) already, or this will be
-                # substituted with the shortest path(s) in G_R later.
-                if line[i] == "*":
+                # Last line
+                if line == "":
                     continue
 
-                # ignore line, hence this step set is kept empty
-                elif line[i] == "":
-                    target = vertices[i]
+                # Split line by tabulators. First field is always the source.
+                line = line.split("\t")
+                source = line[0]
 
-                    # Keep track of purposefully emptpy sets
-                    ignore_tuples += [(source, target)]
-                else:
-                    # Set transit sets in transit_function. R(u,u) entries are ignored.
-                    target = vertices[i]
-                    # if source == target:
+                # Split line by tabulator. Now every list entry in the line
+                # is lined up with the vertices in vertices.
+                line = line[1::]
+
+                # Iterate over line and fill the transit function.
+                for i in range(len(line)):
+
+                    # This is ensured by (t3) already, or this will be
+                    # substituted with the shortest path(s) in G_R later.
+                    if line[i] == "*":
+                        continue
+
+                    # ignore line, hence this step set is kept empty
+                    elif line[i] == "":
+                        target = vertices[i]
+
+                        # Keep track of purposefully emptpy sets
+                        ignore_tuples += [(source, target)]
+                    else:
+                        # Set transit sets in transit_function. R(u,u) entries are ignored.
+                        target = vertices[i]
+                        # if source == target:
+                        #     continue
+                        # else:
+                        transit_list = line[i].split(",")
+                        stepfunction_dict[(source, target)] = set(transit_list)
+
+            stepfunction_set = self.step_dic_to_set(stepfunction_dict)
+
+            # Output supplied stepfunction
+            print("\n---\n")
+            print("*** Stepfunction before step-adding ***")
+
+            counter = 0
+
+            for t in stepfunction_set:
+                print(tstr(t))
+
+            # Save the original transit function
+            orig_stepfunction_dict = copy.copy(stepfunction_dict)
+
+            # Initialize NetworkX graph object to obtain shortest paths later
+            graph = nx.Graph()
+
+            # Add all the vertices
+            for vert in vertices:
+                graph.add_node(vert)
+
+            # Add edges to graph if tuple is (u, v, v).
+            for t in stepfunction_set:
+                if t[1] == t[2]:
+                    graph.add_edge(t[0], t[1])
+
+            # Output edges of G_R
+            print("\n---\n")
+            print("*** Constructed edges ***")
+            print(sstr(list(graph.edges())).replace("'", ""))
+
+            # Keep track of added paths
+            added_paths = []
+
+            for k in stepfunction_dict:
+                # If the step triple is supposed to be empty
+                if k in ignore_tuples or k[0] == k[1]:
+                    continue
+
+                # Get all the shortest paths with nx
+                try:
+                    paths = list(nx.all_shortest_paths(graph, source=k[0], target=k[1]))
+                except nx.NetworkXNoPath:
+                    continue
+
+                # Is there only one path
+                if len(paths) == 1:
+                    # Does the path only contain one vertex (u = v), continue.
+                    if len(paths[0]) == 1:
+                        continue
+                    # # Does the path contain two vertices (edge must be defined as such already), continue
+                    # if len(paths[0]) == 2:
                     #     continue
-                    # else:
-                    transit_list = line[i].split(",")
-                    stepfunction_dict[(source, target)] = set(transit_list)
 
-        stepfunction_set = self.step_dic_to_set(stepfunction_dict)
+                # If the transit set for this tuple is not set yet (not supplied by user)
+                if stepfunction_dict[k] == set():
+                    t_set = set()
 
-        # Output supplied stepfunction
-        print("\n---\n")
-        print("*** Stepfunction before step-adding ***")
+                    # Collecting all the first vertices along all shortest paths in t_set
+                    for p in paths:
+                        t_set = t_set.union({p[1]})
+                        added_paths += [k]
 
-        counter = 0
+                    # Set the transit set of current tuple to t_set
+                    stepfunction_dict[k] = t_set
+                else:
+                    pass
 
-        for t in stepfunction_set:
-            print(tstr(t))
+            # output the added paths
+            for t in added_paths:
+                print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
 
-        # Save the original transit function
-        orig_stepfunction_dict = copy.copy(stepfunction_dict)
+            if len(added_paths) > 0:
+                print()
 
-        # Initialize NetworkX graph object to obtain shortest paths later
-        graph = nx.Graph()
+            # Output the transit function after adding the shortest paths in G_R
+            print("\n---\n")
+            print("*** Step Function after step-adding (as transit function) ***")
 
-        # Add all the vertices
-        for vert in vertices:
-            graph.add_node(vert)
+            # Provide a structured output of the transit function
+            counter = 0
+            for k in stepfunction_dict:
+                if counter % len(vertices) == 0 and counter != 0:
+                    print("-")
+                print(r(k[0], k[1]), eq(), sstr(stepfunction_dict[k]))
+                counter += 1
 
-        # Add edges to graph if tuple is (u, v, v).
-        for t in stepfunction_set:
-            if t[1] == t[2]:
-                graph.add_edge(t[0], t[1])
+            print("\n---\n")
+            print("*** Step Function after step-adding (as set) ***")
 
-        # Output edges of G_R
-        print("\n---\n")
-        print("*** Constructed edges ***")
-        print(sstr(list(graph.edges())).replace("'", ""))
+            stepfunction_set = self.step_dic_to_set(stepfunction_dict)
+            for t in stepfunction_set:
+                print(tstr(t))
 
-        # Keep track of added paths
-        added_paths = []
+            # Store stetpfunction dict in class variable
+            self.stepfunction_dict = stepfunction_dict
 
-        for k in stepfunction_dict:
-            # If the step triple is supposed to be empty
-            if k in ignore_tuples or k[0] == k[1]:
-                continue
+            # Store stepfunction set in class variable
+            self.stepfunction_set = stepfunction_set
 
-            # Get all the shortest paths with nx
-            try:
-                paths = list(nx.all_shortest_paths(graph, source=k[0], target=k[1]))
-            except nx.NetworkXNoPath:
-                continue
+            # Initialize axioms with transit function and save in class variable
+            self.axioms = axioms(self.stepfunction_set)
 
-            # Is there only one path
-            if len(paths) == 1:
-                # Does the path only contain one vertex (u = v), continue.
-                if len(paths[0]) == 1:
-                    continue
-                # # Does the path contain two vertices (edge must be defined as such already), continue
-                # if len(paths[0]) == 2:
-                #     continue
+            # Save digraph to class variable
+            self.graph = graph
 
-            # If the transit set for this tuple is not set yet (not supplied by user)
-            if stepfunction_dict[k] == set():
-                t_set = set()
+            self.vertices = vertices
 
-                # Collecting all the first vertices along all shortest paths in t_set
-                for p in paths:
-                    t_set = t_set.union({p[1]})
-                    added_paths += [k]
+        else:
+            self.stepfunction_set = stepfunction_set
 
-                # Set the transit set of current tuple to t_set
-                stepfunction_dict[k] = t_set
-            else:
-                pass
+            self.vertices = vertices
 
-        # output the added paths
-        for t in added_paths:
-            print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
+            self.graph = step_to_graph(stepfunction_set)
 
-        if len(added_paths) > 0:
-            print()
+            stepfunction_dict = dict()
 
-        # Output the transit function after adding the shortest paths in G_R
-        print("\n---\n")
-        print("*** Step Function after step-adding (as transit function) ***")
+            for u in vertices:
+                for v in vertices:
+                    stepfunction_dict[(u, v)] = set()
 
-        # Provide a structured output of the transit function
-        counter = 0
-        for k in stepfunction_dict:
-            if counter % len(vertices) == 0 and counter != 0:
-                print("-")
-            print(r(k[0], k[1]), eq(), sstr(stepfunction_dict[k]))
-            counter += 1
+            for t in stepfunction_set:
+                stepfunction_dict[(t[0], t[2])] = t[1]
 
-        print("\n---\n")
-        print("*** Step Function after step-adding (as set) ***")
+            self.stepfunction_dict = stepfunction_dict
 
-        stepfunction_set = self.step_dic_to_set(stepfunction_dict)
-        for t in stepfunction_set:
-            print(tstr(t))
+            self.axioms = axioms(self.stepfunction_set)
 
-        # Store stetpfunction dict in class variable
-        self.stepfunction_dict = stepfunction_dict
 
-        # Store stepfunction set in class variable
-        self.stepfunction_set = stepfunction_set
-
-        # Initialize axioms with transit function and save in class variable
-        self.axioms = axioms(self.stepfunction_set)
-
-        # Save digraph to class variable
-        self.graph = graph
-
-        self.vertices = vertices
 
     def step_dic_to_set(self, stepfunction_dic, print_info=True):
         stepfunction_set = []
@@ -193,10 +217,11 @@ class stepfunction:
 
     def check_axioms(self, ax_choice, print_info=True):
 
-        sat_list = [False for a in ax_choice]
+        sat_list = [True for a in ax_choice]
 
         if "A" in ax_choice:
-            print("Check (A)...\n")
+            if print_info:
+                print("Check (A)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -204,7 +229,8 @@ class stepfunction:
                         sat_list[ax_choice.index("A")] = min(sat_list[ax_choice.index("A")], sat)
 
         if "B" in ax_choice:
-            print("Check (B)...\n")
+            if print_info:
+                print("Check (B)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -212,14 +238,16 @@ class stepfunction:
                         sat_list[ax_choice.index("B")] = min(sat_list[ax_choice.index("B")], sat)
 
         if "H" in ax_choice:
-            print("Check (H)...\n")
+            if print_info:
+                print("Check (H)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     sat = self.axioms.H(u, v, print_info=print_info)
                     sat_list[ax_choice.index("H")] = min(sat_list[ax_choice.index("H")], sat)
 
         if "C" in ax_choice:
-            print("Check (C)...\n")
+            if print_info:
+                print("Check (C)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -228,7 +256,8 @@ class stepfunction:
                             sat_list[ax_choice.index("C")] = min(sat_list[ax_choice.index("C")], sat)
 
         if "D" in ax_choice:
-            print("Check (D)...\n")
+            if print_info:
+                print("Check (D)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -237,7 +266,8 @@ class stepfunction:
                             sat_list[ax_choice.index("D")] = min(sat_list[ax_choice.index("D")], sat)
 
         if "F" in ax_choice:
-            print("Check (F)...\n")
+            if print_info:
+                print("Check (F)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -246,7 +276,8 @@ class stepfunction:
                             sat_list[ax_choice.index("F")] = min(sat_list[ax_choice.index("F")], sat)
 
         if "G" in ax_choice:
-            print("Check (G)...\n")
+            if print_info:
+                print("Check (G)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -255,7 +286,8 @@ class stepfunction:
                             sat_list[ax_choice.index("G")] = min(sat_list[ax_choice.index("G")], sat)
 
         if "E" in ax_choice:
-            print("Check (E)...\n")
+            if print_info:
+                print("Check (E)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -264,7 +296,8 @@ class stepfunction:
                             sat_list[ax_choice.index("E")] = min(sat_list[ax_choice.index("E")], sat)
 
         if "Pt" in ax_choice:
-            print("Check (Pt)...\n")
+            if print_info:
+                print("Check (Pt)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -273,7 +306,8 @@ class stepfunction:
                             sat_list[ax_choice.index("Pt")] = min(sat_list[ax_choice.index("Pt")], sat)
 
         if "Dd" in ax_choice:
-            print("Check (Dd)...\n")
+            if print_info:
+                print("Check (Dd)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for w in self.vertices:
@@ -285,7 +319,8 @@ class stepfunction:
                                         sat_list[ax_choice.index("Dd")] = min(sat_list[ax_choice.index("Dd")], sat)
 
         if "Dt" in ax_choice:
-            print("Check (Dt)...\n")
+            if print_info:
+                print("Check (Dt)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -295,7 +330,8 @@ class stepfunction:
                                 sat_list[ax_choice.index("Dt")] = min(sat_list[ax_choice.index("Dt")], sat)
 
         if "Cw" in ax_choice:
-            print("Check (Cw)...\n")
+            if print_info:
+                print("Check (Cw)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -304,7 +340,8 @@ class stepfunction:
                             sat_list[ax_choice.index("Cw")] = min(sat_list[ax_choice.index("Cw")], sat)
 
         if "Cb" in ax_choice:
-            print("Check (Cb)...\n")
+            if print_info:
+                print("Check (Cb)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for w in self.vertices:
@@ -314,7 +351,8 @@ class stepfunction:
                                 sat_list[ax_choice.index("Cb")] = min(sat_list[ax_choice.index("Cb")], sat)
 
         if "Dm" in ax_choice:
-            print("Check (Dm)...\n")
+            if print_info:
+                print("Check (Dm)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -323,7 +361,8 @@ class stepfunction:
                             sat_list[ax_choice.index("Dm")] = min(sat_list[ax_choice.index("Dm")], sat)
 
         if "T1" in ax_choice:
-            print("Check (T1)...\n")
+            if print_info:
+                print("Check (T1)...\n")
             for x in self.vertices:
                 for y in self.vertices:
                     for t in self.vertices:
@@ -331,7 +370,8 @@ class stepfunction:
                         sat_list[ax_choice.index("T1")] = min(sat_list[ax_choice.index("T1")], sat)
 
         if "T2" in ax_choice:
-            print("Check (T2)...\n")
+            if print_info:
+                print("Check (T2)...\n")
             for x in self.vertices:
                 for y in self.vertices:
                     for z in self.vertices:
@@ -339,7 +379,8 @@ class stepfunction:
                         sat_list[ax_choice.index("T2")] = min(sat_list[ax_choice.index("T2")], sat)
 
         if "Tb2" in ax_choice:
-            print("Check (Tb2)...\n")
+            if print_info:
+                print("Check (Tb2)...\n")
             for x in self.vertices:
                 for y in self.vertices:
                     for z in self.vertices:
@@ -347,7 +388,8 @@ class stepfunction:
                         sat_list[ax_choice.index("Tb2")] = min(sat_list[ax_choice.index("Tb2")], sat)
 
         if "P4" in ax_choice:
-            print("Check (P4)...\n")
+            if print_info:
+                print("Check (P4)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
@@ -356,7 +398,8 @@ class stepfunction:
                             sat_list[ax_choice.index("P4")] = min(sat_list[ax_choice.index("P4")], sat)
 
         if "Sm" in ax_choice:
-            print("Check (Sm)...\n")
+            if print_info:
+                print("Check (Sm)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for w in self.vertices:
@@ -369,7 +412,7 @@ class stepfunction:
         return sat_list
 
 
-    def check_additional(self):
+    def check_additional(self, print_info=True):
         test_stepfunction = graph_to_step(self.graph)
 
         t_in_graph_not_in_sf = []
@@ -384,21 +427,26 @@ class stepfunction:
                 t_in_sf_not_in_graph += [t]
 
         if len(t_in_graph_not_in_sf) == 0 and len(t_in_sf_not_in_graph) == 0:
-            print("The step system of G_T is equal to the step function provided.")
+            if print_info:
+                print("The step system of G_T is equal to the step function provided.")
         else:
-            print("The step system of G_T differs from the step function provided.")
+            if print_info:
+                print("The step system of G_T differs from the step function provided.")
 
-            print()
-            print("Triples derived from G_T that are not in T:")
+                print()
+                print("Triples derived from G_T that are not in T:")
 
-            for t in t_in_graph_not_in_sf:
-                print(t)
+            if print_info:
+                for t in t_in_graph_not_in_sf:
+                    print(t)
 
-            print()
-            print("Triples in T that cannot be derived from G_T:")
+            if print_info:
+                print()
+                print("Triples in T that cannot be derived from G_T:")
 
-            for t in t_in_sf_not_in_graph:
-                print(t)
+            if print_info:
+                for t in t_in_sf_not_in_graph:
+                    print(t)
 
 
     def save_graph(self, csv_file):

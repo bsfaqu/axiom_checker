@@ -5,6 +5,7 @@ from tf_axioms import axioms
 import copy
 import matplotlib.pyplot as plt
 from math_strings import *
+from graph_tools import *
 
 class transit_function:
 
@@ -15,180 +16,191 @@ class transit_function:
 
     # TODO add optional output (print_info = True or sth similar)
 
-    def __init__(self, csv_lines):
-        # Parse vertices from the first line
-        vertices = csv_lines[0].split("\t")[1::]
+    def __init__(self, csv_lines=None, transit_function=None, vertices=None):
 
-        # Remove the first line (only contains vertices)
-        csv_lines = csv_lines[1::]
+        if csv_lines != None:
+            # Parse vertices from the first line
+            vertices = csv_lines[0].split("\t")[1::]
 
-        # Here we save all the transit sets. Keys are tuples (u,v) and values are sets.
-        transit_function = {}
+            # Remove the first line (only contains vertices)
+            csv_lines = csv_lines[1::]
 
-        # Transit sets that are always supposed to be empty, i.e fields filled
-        # with "", hence no string
-        ignore_tuples = []
+            # Here we save all the transit sets. Keys are tuples (u,v) and values are sets.
+            transit_function = {}
 
-        # Initialize transit sets as empty and ensure (t3)
-        for u in vertices:
-            for v in vertices:
-                transit_function[(u, v)] = set()
+            # Transit sets that are always supposed to be empty, i.e fields filled
+            # with "", hence no string
+            ignore_tuples = []
 
-                # Enforce (t3)
-                if u == v:
-                    transit_function[(u, v)] = {u}
+            # Initialize transit sets as empty and ensure (t3)
+            for u in vertices:
+                for v in vertices:
+                    transit_function[(u, v)] = set()
 
-        # Parse all the transit sets supplied in the .tsv
-        for line in csv_lines:
+                    # Enforce (t3)
+                    if u == v:
+                        transit_function[(u, v)] = {u}
 
-            # Last line
-            if line == "":
-                continue
+            # Parse all the transit sets supplied in the .tsv
+            for line in csv_lines:
 
-            # Split line by tabulators. First field is always the source.
-            line = line.split("\t")
-            source = line[0]
-
-            # Split line by tabulator. Now every list entry in the line
-            # is lined up with the vertices in vertices.
-            line = line[1::]
-
-            # Iterate over line and fill the transit function.
-            for i in range(len(line)):
-
-                # This is ensured by (t3) already, or this will be
-                # substituted with the shortest path(s) in G_R later.
-                if line[i] == "*":
+                # Last line
+                if line == "":
                     continue
 
-                # ignore line, hence this transit set is kept empty
-                elif line[i] == "":
-                    target = vertices[i]
+                # Split line by tabulators. First field is always the source.
+                line = line.split("\t")
+                source = line[0]
 
-                    # Keep track of purposefully emptpy sets
-                    ignore_tuples += [(source, target)]
-                else:
-                    # Set transit sets in transit_function. R(u,u) entries are ignored.
-                    target = vertices[i]
-                    if source == target:
+                # Split line by tabulator. Now every list entry in the line
+                # is lined up with the vertices in vertices.
+                line = line[1::]
+
+                # Iterate over line and fill the transit function.
+                for i in range(len(line)):
+
+                    # This is ensured by (t3) already, or this will be
+                    # substituted with the shortest path(s) in G_R later.
+                    if line[i] == "*":
+                        continue
+
+                    # ignore line, hence this transit set is kept empty
+                    elif line[i] == "":
+                        target = vertices[i]
+
+                        # Keep track of purposefully emptpy sets
+                        ignore_tuples += [(source, target)]
+                    else:
+                        # Set transit sets in transit_function. R(u,u) entries are ignored.
+                        target = vertices[i]
+                        if source == target:
+                            continue
+                        else:
+                            transit_list = line[i].split(",")
+                            transit_function[(source, target)] = set(transit_list)
+
+            # Check of (t1)
+            for k in transit_function:
+                curr_set = set(k)
+                if transit_function[k] != set():
+                    if curr_set.issubset(transit_function[k]):
                         continue
                     else:
-                        transit_list = line[i].split(",")
-                        transit_function[(source, target)] = set(transit_list)
+                        print(r(k[0], k[1]), eq(), sstr(transit_function[k]))
+                        print("Last transit set violates (t1) or (t3).")
+                        sys.exit()
 
-        # Check of (t1)
-        for k in transit_function:
-            curr_set = set(k)
-            if transit_function[k] != set():
-                if curr_set.issubset(transit_function[k]):
+            # Output supplied transit sets
+            print("\n---\n")
+            print("*** Transit function before interval adding ***")
+
+            counter = 0
+
+            for k in transit_function:
+                if counter % len(vertices) == 0 and counter != 0:
+                    print("-")
+                print(r(k[0], k[1]), eq(), sstr(transit_function[k]))
+                counter += 1
+
+            # Save the original transit function
+            orig_transit_function = copy.copy(transit_function)
+
+            # Initialize NetworkX graph object to obtain shortest paths later
+            graph = nx.DiGraph()
+
+            # Add all the vertices
+            for vert in vertices:
+                graph.add_node(vert)
+
+            # Add all the edges (defined by transit sets of size 2)
+            for k in transit_function:
+                curr_set = set(k)
+                if len(transit_function[k]) == 2:
+                    graph.add_edge(k[0], k[1])
+
+            # Output edges of G_R
+            print("\n---\n")
+            print("*** Constructed edges ***")
+            print(sstr(list(graph.edges())).replace("'", ""))
+
+            # Keep track of added paths
+            added_paths = []
+
+            for k in transit_function:
+                # If the transit set R(k[0], k[1]) should be kept empty,
+                # also transit sets for R(u, u) are ignored
+                if k in ignore_tuples or k[0] == k[1]:
                     continue
+
+                # Get all the shortest paths with nx
+                try:
+                    paths = list(nx.all_shortest_paths(graph, source=k[0], target=k[1]))
+                    # Change the last line to this one for the all-path function.
+                    # paths = list(nx.all_simple_paths(graph, source=k[0], target=k[1]))
+                except nx.NetworkXNoPath:
+                    continue
+
+                # Is there only one path
+                if len(paths) == 1:
+                    # Does the path only contain one vertex (u = v), continue.
+                    if len(paths[0]) == 1:
+                        continue
+                    # Does the path contain two vertices (edge must be defined as such already), continue
+                    if len(paths[0]) == 2:
+                        continue
+
+                # If the transit set for this tuple is not set yet (not supplied by user)
+                if transit_function[k] == set():
+                    t_set = set()
+
+                    # Collecting all vertices along all shortest paths in t_set
+                    for p in paths:
+                        t_set = t_set.union(set(p))
+                        added_paths += [k]
+
+                    # Set the transit set of current tuple to t_set
+                    transit_function[k] = t_set
                 else:
-                    print(r(k[0], k[1]), eq(), sstr(transit_function[k]))
-                    print("Last transit set violates (t1) or (t3).")
-                    sys.exit()
+                    pass
 
-        # Output supplied transit sets
-        print("\n---\n")
-        print("*** Transit function before interval adding ***")
+            # Output the transit function after adding the shortest paths in G_R
+            print("\n---\n")
+            print("*** Transit function after interval adding ***")
 
-        counter = 0
+            # output the added paths
+            for t in added_paths:
+                print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
 
-        for k in transit_function:
-            if counter % len(vertices) == 0 and counter != 0:
-                print("-")
-            print(r(k[0], k[1]), eq(), sstr(transit_function[k]))
-            counter += 1
+            if len(added_paths) > 0:
+                print()
 
-        # Save the original transit function
-        orig_transit_function = copy.copy(transit_function)
+            # Provide a structured output of the transit function
+            counter = 0
+            for k in transit_function:
+                if counter % len(vertices) == 0 and counter != 0:
+                    print("-")
+                print(r(k[0], k[1]), eq(), sstr(transit_function[k]))
+                counter += 1
 
-        # Initialize NetworkX graph object to obtain shortest paths later
-        graph = nx.DiGraph()
+            # Store transit function in class variable
+            self.transit_function = transit_function
 
-        # Add all the vertices
-        for vert in vertices:
-            graph.add_node(vert)
+            # Initialize axioms with transit function and save in class variable
+            self.axioms = axioms(self.transit_function)
 
-        # Add all the edges (defined by transit sets of size 2)
-        for k in transit_function:
-            curr_set = set(k)
-            if len(transit_function[k]) == 2:
-                graph.add_edge(k[0], k[1])
+            # Save digraph to class variable
+            self.graph = graph
 
-        # Output edges of G_R
-        print("\n---\n")
-        print("*** Constructed edges ***")
-        print(sstr(list(graph.edges())).replace("'", ""))
+            self.vertices = vertices
 
-        # Keep track of added paths
-        added_paths = []
+        else:
+            self.vertices = vertices
 
-        for k in transit_function:
-            # If the transit set R(k[0], k[1]) should be kept empty,
-            # also transit sets for R(u, u) are ignored
-            if k in ignore_tuples or k[0] == k[1]:
-                continue
+            self.transit_function = transit_function
 
-            # Get all the shortest paths with nx
-            try:
-                paths = list(nx.all_shortest_paths(graph, source=k[0], target=k[1]))
-                # Change the last line to this one for the all-path function.
-                # paths = list(nx.all_simple_paths(graph, source=k[0], target=k[1]))
-            except nx.NetworkXNoPath:
-                continue
+            self.graph = transit_to_graph(transit_function)
 
-            # Is there only one path
-            if len(paths) == 1:
-                # Does the path only contain one vertex (u = v), continue.
-                if len(paths[0]) == 1:
-                    continue
-                # Does the path contain two vertices (edge must be defined as such already), continue
-                if len(paths[0]) == 2:
-                    continue
-
-            # If the transit set for this tuple is not set yet (not supplied by user)
-            if transit_function[k] == set():
-                t_set = set()
-
-                # Collecting all vertices along all shortest paths in t_set
-                for p in paths:
-                    t_set = t_set.union(set(p))
-                    added_paths += [k]
-
-                # Set the transit set of current tuple to t_set
-                transit_function[k] = t_set
-            else:
-                pass
-
-        # Output the transit function after adding the shortest paths in G_R
-        print("\n---\n")
-        print("*** Transit function after interval adding ***")
-
-        # output the added paths
-        for t in added_paths:
-            print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
-
-        if len(added_paths) > 0:
-            print()
-
-        # Provide a structured output of the transit function
-        counter = 0
-        for k in transit_function:
-            if counter % len(vertices) == 0 and counter != 0:
-                print("-")
-            print(r(k[0], k[1]), eq(), sstr(transit_function[k]))
-            counter += 1
-
-        # Store transit function in class variable
-        self.transit_function = transit_function
-
-        # Initialize axioms with transit function and save in class variable
-        self.axioms = axioms(self.transit_function)
-
-        # Save digraph to class variable
-        self.graph = graph
-
-        self.vertices = vertices
+            self.axioms = axioms(self.transit_function)
 
     def R(self, u, v):
         return sstr(self.transit_function[(u, v)])
@@ -217,12 +229,15 @@ class transit_function:
         #     else:
         #         sat_axioms[a] = True
 
-        sat_list = [False for a in ax_choice]
+        sat_list = [True for a in ax_choice]
+
+        # TODO Maybe introduce separate choices for b1_1/2/3 ...
 
         # Check all the axioms.
 
         if "t0" in ax_choice:
-            print("Check t0...\n")
+            if print_info:
+                print("Check t0...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
@@ -230,21 +245,24 @@ class transit_function:
                         sat_list[ax_choice.index("t0")] = min(sat_list[ax_choice.index("t0")], sat_val)
 
         if "t2s" in ax_choice:
-            print("Check t2s...\n")
+            if print_info:
+                print("Check t2s...\n")
             for u in vertices:
                 for v in vertices:
                     sat_val = self.axioms.t2s(u, v, print_info=print_info)
                     sat_list[ax_choice.index("t2s")] = min(sat_list[ax_choice.index("t2s")], sat_val)
 
         if "t2a" in ax_choice:
-            print("Check t2a...\n")
+            if print_info:
+                print("Check t2a...\n")
             for u in vertices:
                 for v in vertices:
                     sat_val = self.axioms.t2a(u, v, print_info=print_info)
                     sat_list[ax_choice.index("t2a")] = min(sat_list[ax_choice.index("t2a")], sat_val)
 
         if "tr2" in ax_choice:
-            print("Check tr2...\n")
+            if print_info:
+                print("Check tr2...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
@@ -252,17 +270,19 @@ class transit_function:
                         sat_list[ax_choice.index("tr2")] = min(sat_list[ax_choice.index("tr2")], sat_val)
 
         if "b1" in ax_choice:
-            print("Check b1...\n")
+            if print_info:
+                print("Check b1...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
                         sat_val_1 = self.axioms.b1_1(u, v, x, print_info=print_info)
-                        sat_list[ax_choice.index("b1")] = min(sat_list[ax_choice.index("b1")], sat_val)
+                        sat_list[ax_choice.index("b1")] = min(sat_list[ax_choice.index("b1")], sat_val_1)
                         sat_val_2 = self.axioms.b1_2(u, v, x, print_info=print_info)
-                        sat_list[ax_choice.index("b1")] = min(sat_list[ax_choice.index("b1")], sat_val)
+                        sat_list[ax_choice.index("b1")] = min(sat_list[ax_choice.index("b1")], sat_val_2)
 
         if "b2" in ax_choice:
-            print("Check b2...\n")
+            if print_info:
+                print("Check b2...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
@@ -270,7 +290,8 @@ class transit_function:
                         sat_list[ax_choice.index("b2")] = min(sat_list[ax_choice.index("b2")], sat_val)
 
         if "b3" in ax_choice:
-            print("Check b3...\n")
+            if print_info:
+                print("Check b3...\n")
             for u in vertices:
                 for x in vertices:
                     for y in vertices:
@@ -279,12 +300,13 @@ class transit_function:
                                 continue
                             else:
                                 sat_val_1 = self.axioms.b3_1(u, v, x, y, print_info=print_info)
-                                sat_list[ax_choice.index("b3")] = min(sat_list[ax_choice.index("b3")], sat_val)
+                                sat_list[ax_choice.index("b3")] = min(sat_list[ax_choice.index("b3")], sat_val_1)
                                 sat_val_2 = self.axioms.b3_2(u, v, x, y, print_info=print_info)
-                                sat_list[ax_choice.index("b3")] = min(sat_list[ax_choice.index("b3")], sat_val)
+                                sat_list[ax_choice.index("b3")] = min(sat_list[ax_choice.index("b3")], sat_val_2)
 
         if "b4" in ax_choice:
-            print("Check b4...\n")
+            if print_info:
+                print("Check b4...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -292,19 +314,21 @@ class transit_function:
                         sat_list[ax_choice.index("b4")] = min(sat_list[ax_choice.index("b4")], sat_val)
 
         if "b6" in ax_choice:
-            print("Check b6...\n")
+            if print_info:
+                print("Check b6...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
                         sat_val_1 = self.axioms.b6_1(u, v, w, print_info=print_info)
-                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val)
+                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val_1)
                         sat_val_2 = self.axioms.b6_2(u, v, w, print_info=print_info)
-                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val)
+                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val_2)
                         sat_val_3 = self.axioms.b6_3(u, v, w, print_info=print_info)
-                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val)
+                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val_3)
 
         if "j2" in ax_choice:
-            print("Check j2...\n")
+            if print_info:
+                print("Check j2...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -312,7 +336,8 @@ class transit_function:
                         sat_list[ax_choice.index("j2")] = min(sat_list[ax_choice.index("j2")], sat_val)
 
         if "F" in ax_choice:
-            print("Check F...\n")
+            if print_info:
+                print("Check F...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -321,7 +346,8 @@ class transit_function:
                             sat_list[ax_choice.index("F")] = min(sat_list[ax_choice.index("F")], sat_val)
 
         if "G" in ax_choice:
-            print("Check G...\n")
+            if print_info:
+                print("Check G...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -330,7 +356,8 @@ class transit_function:
                             sat_list[ax_choice.index("G")] = min(sat_list[ax_choice.index("G")], sat_val)
 
         if "co0" in ax_choice:
-            print("Check co0...\n")
+            if print_info:
+                print("Check co0...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -338,7 +365,8 @@ class transit_function:
                         sat_list[ax_choice.index("co0")] = min(sat_list[ax_choice.index("co0")], sat_val)
 
         if "co1" in ax_choice:
-            print("Check co1...\n")
+            if print_info:
+                print("Check co1...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -346,7 +374,8 @@ class transit_function:
                         sat_list[ax_choice.index("co1")] = min(sat_list[ax_choice.index("co1")], sat_val)
 
         if "co2" in ax_choice:
-            print("Check co2...\n")
+            if print_info:
+                print("Check co2...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -355,7 +384,8 @@ class transit_function:
                             sat_list[ax_choice.index("co2")] = min(sat_list[ax_choice.index("co2")], sat_val)
 
         if "co3" in ax_choice:
-            print("Check co3...\n")
+            if print_info:
+                print("Check co3...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -364,7 +394,8 @@ class transit_function:
                             sat_list[ax_choice.index("co3")] = min(sat_list[ax_choice.index("co3")], sat_val)
 
         if "g" in ax_choice:
-            print("Check g...\n")
+            if print_info:
+                print("Check g...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -373,7 +404,8 @@ class transit_function:
                             sat_list[ax_choice.index("g")] = min(sat_list[ax_choice.index("g")], sat_val)
 
         if "p" in ax_choice:
-            print("Check p...\n")
+            if print_info:
+                print("Check p...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
@@ -381,7 +413,8 @@ class transit_function:
                         sat_list[ax_choice.index("p")] = min(sat_list[ax_choice.index("p")], sat_val)
 
         if "mod" in ax_choice:
-            print("Check mod...\n")
+            if print_info:
+                print("Check mod...\n")
             for u in vertices:
                 for w in vertices:
                     for v in vertices:
@@ -389,7 +422,8 @@ class transit_function:
                         sat_list[ax_choice.index("mod")] = min(sat_list[ax_choice.index("mod")], sat_val)
 
         if "med" in ax_choice:
-            print("Check med...\n")
+            if print_info:
+                print("Check med...\n")
             for u in vertices:
                 for w in vertices:
                     for v in vertices:
@@ -397,7 +431,8 @@ class transit_function:
                         sat_list[ax_choice.index("med")] = min(sat_list[ax_choice.index("med")], sat_val)
 
         if "b5" in ax_choice:
-            print("Check b5...\n")
+            if print_info:
+                print("Check b5...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
@@ -405,17 +440,19 @@ class transit_function:
                         sat_list[ax_choice.index("b5")] = min(sat_list[ax_choice.index("b5")], sat_val)
 
         if "ta" in ax_choice:
-            print("Check ta...\n")
+            if print_info:
+                print("Check ta...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
                         sat_val_1 = self.axioms.ta1(u, w, v, print_info=print_info)
-                        sat_list[ax_choice.index("ta")] = min(sat_list[ax_choice.index("ta")], sat_val)
+                        sat_list[ax_choice.index("ta")] = min(sat_list[ax_choice.index("ta")], sat_val_1)
                         sat_val_2 = self.axioms.ta2(u, w, v, print_info=print_info)
-                        sat_list[ax_choice.index("ta")] = min(sat_list[ax_choice.index("ta")], sat_val)
+                        sat_list[ax_choice.index("ta")] = min(sat_list[ax_choice.index("ta")], sat_val_2)
 
         if "rv" in ax_choice:
-            print("Check rv...\n")
+            if print_info:
+                print("Check rv...\n")
             for u in vertices:
                 for x in vertices:
                     for y in vertices:
@@ -427,6 +464,7 @@ class transit_function:
                                 sat_list[ax_choice.index("rv")] = min(sat_list[ax_choice.index("rv")], sat_val)
 
         return sat_list
+
 
     def check_additional(self):
 
