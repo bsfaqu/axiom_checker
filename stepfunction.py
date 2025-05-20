@@ -191,7 +191,7 @@ class stepfunction:
 
         return set(stepfunction_set)
 
-    def check_axioms(self, ax_choice):
+    def check_axioms(self, ax_choice, print_info=True):
 
         sat_list = [False for a in ax_choice]
 
@@ -200,20 +200,23 @@ class stepfunction:
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
-                        self.axioms.A(u, v, x)
+                        sat = self.axioms.A(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("A")] = min(sat_list[ax_choice.index("A")], sat)
 
         if "B" in ax_choice:
             print("Check (B)...\n")
             for u in self.vertices:
                 for v in self.vertices:
                     for x in self.vertices:
-                        self.axioms.B(u, v, x)
+                        sat = self.axioms.B(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("B")] = min(sat_list[ax_choice.index("B")], sat)
 
         if "H" in ax_choice:
             print("Check (H)...\n")
             for u in self.vertices:
                 for v in self.vertices:
-                    self.axioms.H(u, v)
+                    sat = self.axioms.H(u, v, print_info=print_info)
+                    sat_list[ax_choice.index("H")] = min(sat_list[ax_choice.index("H")], sat)
 
         if "C" in ax_choice:
             print("Check (C)...\n")
@@ -221,7 +224,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.C(u, v, x, y)
+                            sat = self.axioms.C(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("C")] = min(sat_list[ax_choice.index("C")], sat)
 
         if "D" in ax_choice:
             print("Check (D)...\n")
@@ -229,7 +233,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.D(u, v, x, y)
+                            sat = self.axioms.D(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("D")] = min(sat_list[ax_choice.index("D")], sat)
 
         if "F" in ax_choice:
             print("Check (F)...\n")
@@ -237,7 +242,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.F(u, v, x, y)
+                            sat = self.axioms.F(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("F")] = min(sat_list[ax_choice.index("F")], sat)
 
         if "G" in ax_choice:
             print("Check (G)...\n")
@@ -245,7 +251,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.G(u, v, x, y)
+                            sat = self.axioms.G(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("G")] = min(sat_list[ax_choice.index("G")], sat)
 
         if "E" in ax_choice:
             print("Check (E)...\n")
@@ -253,7 +260,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.E(u, v, x, y)
+                            sat = self.axioms.E(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("E")] = min(sat_list[ax_choice.index("E")], sat)
 
         if "Pt" in ax_choice:
             print("Check (Pt)...\n")
@@ -261,7 +269,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.Pt(u, v, x, y)
+                            sat = self.axioms.Pt(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("Pt")] = min(sat_list[ax_choice.index("Pt")], sat)
 
         if "Dd" in ax_choice:
             print("Check (Dd)...\n")
@@ -272,7 +281,8 @@ class stepfunction:
                             for y in self.vertices:
                                 for z in self.vertices:
                                     for d in self.vertices:
-                                        self.axioms.Dd(u, v, w, x, y, z, d)
+                                        sat = self.axioms.Dd(u, v, w, x, y, z, d, print_info=print_info)
+                                        sat_list[ax_choice.index("Dd")] = min(sat_list[ax_choice.index("Dd")], sat)
 
         if "Dt" in ax_choice:
             print("Check (Dt)...\n")
@@ -281,7 +291,8 @@ class stepfunction:
                     for x in self.vertices:
                         for y in self.vertices:
                             for z in self.vertices:
-                                self.axioms.Dt(u, v, x, y, z)
+                                sat = self.axioms.Dt(u, v, x, y, z, print_info=print_info)
+                                sat_list[ax_choice.index("Dt")] = min(sat_list[ax_choice.index("Dt")], sat)
 
         if "Cw" in ax_choice:
             print("Check (Cw)...\n")
@@ -289,7 +300,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.Cw(u, v, x, y)
+                            sat = self.axioms.Cw(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("Cw")] = min(sat_list[ax_choice.index("Cw")], sat)
 
         if "Cb" in ax_choice:
             print("Check (Cb)...\n")
@@ -298,7 +310,8 @@ class stepfunction:
                     for w in self.vertices:
                         for x in self.vertices:
                             for y in self.vertices:
-                                self.axioms.Cb(u, v, w, x, y)
+                                sat = self.axioms.Cb(u, v, w, x, y, print_info=print_info)
+                                sat_list[ax_choice.index("Cb")] = min(sat_list[ax_choice.index("Cb")], sat)
 
         if "Dm" in ax_choice:
             print("Check (Dm)...\n")
@@ -306,28 +319,32 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.Dm(u, v, x, y)
+                            sat = self.axioms.Dm(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("Dm")] = min(sat_list[ax_choice.index("Dm")], sat)
 
         if "T1" in ax_choice:
             print("Check (T1)...\n")
             for x in self.vertices:
                 for y in self.vertices:
                     for t in self.vertices:
-                        self.axioms.T1(x, y, t)
+                        sat = self.axioms.T1(x, y, t, print_info=print_info)
+                        sat_list[ax_choice.index("T1")] = min(sat_list[ax_choice.index("T1")], sat)
 
         if "T2" in ax_choice:
             print("Check (T2)...\n")
             for x in self.vertices:
                 for y in self.vertices:
                     for z in self.vertices:
-                        self.axioms.T2(x, y, z)
+                        sat = self.axioms.T2(x, y, z, print_info=print_info)
+                        sat_list[ax_choice.index("T2")] = min(sat_list[ax_choice.index("T2")], sat)
 
         if "Tb2" in ax_choice:
             print("Check (Tb2)...\n")
             for x in self.vertices:
                 for y in self.vertices:
                     for z in self.vertices:
-                        self.axioms.Tb2(x, y, z, self.vertices)
+                        sat = self.axioms.Tb2(x, y, z, self.vertices, print_info=print_info)
+                        sat_list[ax_choice.index("Tb2")] = min(sat_list[ax_choice.index("Tb2")], sat)
 
         if "P4" in ax_choice:
             print("Check (P4)...\n")
@@ -335,7 +352,8 @@ class stepfunction:
                 for v in self.vertices:
                     for x in self.vertices:
                         for y in self.vertices:
-                            self.axioms.P4(u, v, x, y)
+                            sat = self.axioms.P4(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("P4")] = min(sat_list[ax_choice.index("P4")], sat)
 
         if "Sm" in ax_choice:
             print("Check (Sm)...\n")
@@ -345,7 +363,8 @@ class stepfunction:
                         for x in self.vertices:
                             for y in self.vertices:
                                 for z in self.vertices:
-                                    self.axioms.Sm(u, v, w, x, y, z)
+                                    sat = self.axioms.Sm(u, v, w, x, y, z, print_info=print_info)
+                                    sat_list[ax_choice.index("Sm")] = min(sat_list[ax_choice.index("Sm")], sat)
 
 
     def check_additional(self):

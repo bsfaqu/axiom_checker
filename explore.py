@@ -1,10 +1,13 @@
 import networkx as nx
 from matplotlib import pyplot as plt
-from networkx.algorithms import isomorphism
+# from networkx.algorithms import isomorphism
 import sys
 from sys import argv
 from math_strings import *
 from graph_tools import *
+
+def check_instance(ax_choice_true, ax_choice_false, check_object, signpost=False):
+    pass
 
 
 axiom_strings_transit = [
@@ -26,23 +29,25 @@ csv_file = ""
 ax_choice = []
 wrong_file_choice = False
 no_file = True
+random_graphs = False
+num_nodes = 0
 
 for arg in argv:
 
     # Print help string and exit if help argument was supplied
     if arg in ["-h", "--help", "--manual"]:
         print()
-        print("Call check.py with:")
-        print("python check.py -a [axioms] -f [filename]")
-        print("or")
-        print("python check.py --axioms [axioms] --file [filename]")
-        print("[axioms] should be axiom strings, comma separated, i.e. 'b1,b5,tr2'")
-        print("Please do not include any spaces in the axiom string.")
-        print("Stepsystems can be checked by including a -s argument, e.g. ")
-        print("python check.py -s -a [axioms] -f [filename]")
-        print()
-        print("Visualization of G_R/G_T will be saved under the same name as the input file with a .png extension.")
-        print()
+        # print("Call check.py with:")
+        # print("python check.py -a [axioms] -f [filename]")
+        # print("or")
+        # print("python check.py --axioms [axioms] --file [filename]")
+        # print("[axioms] should be axiom strings, comma separated, i.e. 'b1,b5,tr2'")
+        # print("Please do not include any spaces in the axiom string.")
+        # print("Stepsystems can be checked by including a -s argument, e.g. ")
+        # print("python check.py -s -a [axioms] -f [filename]")
+        # print()
+        # print("Visualization of G_R/G_T will be saved under the same name as the input file with a .png extension.")
+        # print()
 
         print("Supported Axioms (Transit Functions):")
         for a in axiom_strings_transit:
@@ -79,16 +84,30 @@ for arg in argv:
         except:
             wrong_file_choice = True
 
+    if arg in ["-r", "--random"]:
+        random_graphs = True
+        num_nodes = argv[argv.index(arg) + 1]
 
-if no_file:
-    ga = nx.graph_atlas_g()
-    valid_graphs = 0
-
-    for graph in ga:
+if not no_file:
+    # TODO Randomly check adjacent transit functions with depth at most 2 for provided SP/TF.
+    pass
+else:
+    if random_graphs:
+        # TODO Check random graphs of specified length and spec. number depth
         pass
+    else:
+        graph_atlas = nx.graph_atlas_g()
+        valid_graphs = 0
+
+        if signpost:
+            for graph in graph_atlas:
+                pass
+            # TODO check all the signpost systems of all graphs
+        elif not signpost:
+            # TODO sParse all undirected graphs to directed and derive tf and check
 
 
-if signpost and no_file:
-    print(valid_graphs, "step systems satisfied the constraints")
-elif not signpost and no_file:
-    print(valid_graphs, "transit functions satisfied the constraints")
+# if signpost and no_file:
+#     print(valid_graphs, "step systems satisfied the constraints")
+# elif not signpost and no_file:
+#     print(valid_graphs, "transit functions satisfied the constraints")

@@ -193,7 +193,7 @@ class transit_function:
     def R(self, u, v):
         return sstr(self.transit_function[(u, v)])
 
-    def check_axioms(self, ax_choice):
+    def check_axioms(self, ax_choice, print_info=True):
 
         # Potential strings to pick axioms:
         # axiom_strings_transit = [
@@ -208,14 +208,16 @@ class transit_function:
         vertices = self.vertices
 
         # Initialize dictionary to save which axioms are satisfied
-        sat_axioms = dict()
-        for a in ax_choice:
-            if a in ["b1", "b2"]:
-                sat_axioms[a] = [True, True]
-            elif a in ["b6"]:
-                sat_axioms[a] = [True, True, True]
-            else:
-                sat_axioms[a] = True
+        # sat_axioms = dict()
+        # for a in ax_choice:
+        #     if a in ["b1", "b2"]:
+        #         sat_axioms[a] = [True, True]
+        #     elif a in ["b6"]:
+        #         sat_axioms[a] = [True, True, True]
+        #     else:
+        #         sat_axioms[a] = True
+
+        sat_list = [False for a in ax_choice]
 
         # Check all the axioms.
 
@@ -224,41 +226,48 @@ class transit_function:
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
-                        sat_val = self.axioms.t0(u, v, w)
+                        sat_val = self.axioms.t0(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("t0")] = min(sat_list[ax_choice.index("t0")], sat_val)
 
         if "t2s" in ax_choice:
             print("Check t2s...\n")
             for u in vertices:
                 for v in vertices:
-                    sat_val = self.axioms.t2s(u, v)
+                    sat_val = self.axioms.t2s(u, v, print_info=print_info)
+                    sat_list[ax_choice.index("t2s")] = min(sat_list[ax_choice.index("t2s")], sat_val)
 
         if "t2a" in ax_choice:
             print("Check t2a...\n")
             for u in vertices:
                 for v in vertices:
-                    sat_val = self.axioms.t2a(u, v)
+                    sat_val = self.axioms.t2a(u, v, print_info=print_info)
+                    sat_list[ax_choice.index("t2a")] = min(sat_list[ax_choice.index("t2a")], sat_val)
 
         if "tr2" in ax_choice:
             print("Check tr2...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
-                        sat_val = self.axioms.tr2(u, v, w)
+                        sat_val = self.axioms.tr2(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("tr2")] = min(sat_list[ax_choice.index("tr2")], sat_val)
 
         if "b1" in ax_choice:
             print("Check b1...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
-                        sat_val_1 = self.axioms.b1_1(u, v, x)
-                        sat_val_2 = self.axioms.b1_2(u, v, x)
+                        sat_val_1 = self.axioms.b1_1(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("b1")] = min(sat_list[ax_choice.index("b1")], sat_val)
+                        sat_val_2 = self.axioms.b1_2(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("b1")] = min(sat_list[ax_choice.index("b1")], sat_val)
 
         if "b2" in ax_choice:
             print("Check b2...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
-                        sat_val = self.axioms.b2(u, v, w)
+                        sat_val = self.axioms.b2(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("b2")] = min(sat_list[ax_choice.index("b2")], sat_val)
 
         if "b3" in ax_choice:
             print("Check b3...\n")
@@ -269,31 +278,38 @@ class transit_function:
                             if x == v or u == y:
                                 continue
                             else:
-                                sat_val_1 = self.axioms.b3_1(u, v, x, y)
-                                sat_val_2 = self.axioms.b3_2(u, v, x, y)
+                                sat_val_1 = self.axioms.b3_1(u, v, x, y, print_info=print_info)
+                                sat_list[ax_choice.index("b3")] = min(sat_list[ax_choice.index("b3")], sat_val)
+                                sat_val_2 = self.axioms.b3_2(u, v, x, y, print_info=print_info)
+                                sat_list[ax_choice.index("b3")] = min(sat_list[ax_choice.index("b3")], sat_val)
 
         if "b4" in ax_choice:
             print("Check b4...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
-                        self.axioms.b4(u, v, x)
+                        self.axioms.b4(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("b4")] = min(sat_list[ax_choice.index("b4")], sat_val)
 
         if "b6" in ax_choice:
             print("Check b6...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
-                        sat_val_1 = self.axioms.b6_1(u, v, w)
-                        sat_val_2 = self.axioms.b6_2(u, v, w)
-                        sat_val_3 = self.axioms.b6_3(u, v, w)
+                        sat_val_1 = self.axioms.b6_1(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val)
+                        sat_val_2 = self.axioms.b6_2(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val)
+                        sat_val_3 = self.axioms.b6_3(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("b6")] = min(sat_list[ax_choice.index("b6")], sat_val)
 
         if "j2" in ax_choice:
             print("Check j2...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
-                        sat_val = self.axioms.j2(u, v, x)
+                        sat_val = self.axioms.j2(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("j2")] = min(sat_list[ax_choice.index("j2")], sat_val)
 
         if "F" in ax_choice:
             print("Check F...\n")
@@ -301,7 +317,8 @@ class transit_function:
                 for v in vertices:
                     for x in vertices:
                         for y in vertices:
-                            sat_val = self.axioms.F(u, v, x, y)
+                            sat_val = self.axioms.F(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("F")] = min(sat_list[ax_choice.index("F")], sat_val)
 
         if "G" in ax_choice:
             print("Check G...\n")
@@ -309,21 +326,24 @@ class transit_function:
                 for v in vertices:
                     for x in vertices:
                         for y in vertices:
-                            sat_val = self.axioms.G(u, v, x, y)
+                            sat_val = self.axioms.G(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("G")] = min(sat_list[ax_choice.index("G")], sat_val)
 
         if "co0" in ax_choice:
             print("Check co0...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
-                        sat_val = self.axioms.co0(u, v, x)
+                        sat_val = self.axioms.co0(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("co0")] = min(sat_list[ax_choice.index("co0")], sat_val)
 
         if "co1" in ax_choice:
             print("Check co1...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
-                        sat_val = self.axioms.co1(u, v, x)
+                        sat_val = self.axioms.co1(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("co1")] = min(sat_list[ax_choice.index("co1")], sat_val)
 
         if "co2" in ax_choice:
             print("Check co2...\n")
@@ -331,7 +351,8 @@ class transit_function:
                 for v in vertices:
                     for x in vertices:
                         for y in vertices:
-                            sat_val = self.axioms.co2(u, v, x, y)
+                            sat_val = self.axioms.co2(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("co2")] = min(sat_list[ax_choice.index("co2")], sat_val)
 
         if "co3" in ax_choice:
             print("Check co3...\n")
@@ -339,7 +360,8 @@ class transit_function:
                 for v in vertices:
                     for x in vertices:
                         for y in vertices:
-                            sat_val = self.axioms.co3(u, v, x, y)
+                            sat_val = self.axioms.co3(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("co3")] = min(sat_list[ax_choice.index("co3")], sat_val)
 
         if "g" in ax_choice:
             print("Check g...\n")
@@ -347,43 +369,50 @@ class transit_function:
                 for v in vertices:
                     for x in vertices:
                         for y in vertices:
-                            sat_val = self.axioms.g(u, v, x, y)
+                            sat_val = self.axioms.g(u, v, x, y, print_info=print_info)
+                            sat_list[ax_choice.index("g")] = min(sat_list[ax_choice.index("g")], sat_val)
 
         if "p" in ax_choice:
             print("Check p...\n")
             for u in vertices:
                 for v in vertices:
                     for x in vertices:
-                        sat_val = self.axioms.p(u, v, x)
+                        sat_val = self.axioms.p(u, v, x, print_info=print_info)
+                        sat_list[ax_choice.index("p")] = min(sat_list[ax_choice.index("p")], sat_val)
 
         if "mod" in ax_choice:
             print("Check mod...\n")
             for u in vertices:
                 for w in vertices:
                     for v in vertices:
-                        sat_val = self.axioms.mod(u, v, w)
+                        sat_val = self.axioms.mod(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("mod")] = min(sat_list[ax_choice.index("mod")], sat_val)
 
         if "med" in ax_choice:
             print("Check med...\n")
             for u in vertices:
                 for w in vertices:
                     for v in vertices:
-                        sat_val = self.axioms.med(u, v, w)
+                        sat_val = self.axioms.med(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("med")] = min(sat_list[ax_choice.index("med")], sat_val)
 
         if "b5" in ax_choice:
             print("Check b5...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
-                        sat_val = self.axioms.b5(u, v, w)
+                        sat_val = self.axioms.b5(u, v, w, print_info=print_info)
+                        sat_list[ax_choice.index("b5")] = min(sat_list[ax_choice.index("b5")], sat_val)
 
         if "ta" in ax_choice:
             print("Check ta...\n")
             for u in vertices:
                 for v in vertices:
                     for w in vertices:
-                        sat_val_1 = self.axioms.ta1(u, w, v)
-                        sat_val_2 = self.axioms.ta2(u, w, v)
+                        sat_val_1 = self.axioms.ta1(u, w, v, print_info=print_info)
+                        sat_list[ax_choice.index("ta")] = min(sat_list[ax_choice.index("ta")], sat_val)
+                        sat_val_2 = self.axioms.ta2(u, w, v, print_info=print_info)
+                        sat_list[ax_choice.index("ta")] = min(sat_list[ax_choice.index("ta")], sat_val)
 
         if "rv" in ax_choice:
             print("Check rv...\n")
@@ -394,7 +423,8 @@ class transit_function:
                             if x == v or u == y:
                                 continue
                             else:
-                                sat_val = self.axioms.rv(u, x, y, v)
+                                sat_val = self.axioms.rv(u, x, y, v, print_info=print_info)
+                                sat_list[ax_choice.index("rv")] = min(sat_list[ax_choice.index("rv")], sat_val)
 
     def check_additional(self):
 
