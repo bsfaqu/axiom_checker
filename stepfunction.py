@@ -182,7 +182,7 @@ class stepfunction:
 
         self.vertices = vertices
 
-    def step_dic_to_set(self, stepfunction_dic):
+    def step_dic_to_set(self, stepfunction_dic, print_info=True):
         stepfunction_set = []
 
         for k in stepfunction_dic.keys():
@@ -192,11 +192,8 @@ class stepfunction:
         return set(stepfunction_set)
 
     def check_axioms(self, ax_choice):
-        # axiom_strings_stepfunctions = [
-        #     "A", "B", "H", "C", "D", "F", "G", "E",
-        #     "Pt", "Dd", "Dt", "Cw", "Cb", "Dm", "T1",
-        #     "T2", "Tb2", "P4"
-        # ]
+
+        sat_list = [False for a in ax_choice]
 
         if "A" in ax_choice:
             print("Check (A)...\n")

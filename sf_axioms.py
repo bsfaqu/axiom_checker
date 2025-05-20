@@ -13,7 +13,7 @@ class axioms:
     #     "T2", "Tb2", "P4"
     # ]
 
-    def A(self, u, v, x):
+    def A(self, u, v, x, print_info=True):
         # If(u, v, x) ∈ T
         # then(v, u, u) ∈ T
         # for all u, v, x ∈ V
@@ -22,14 +22,15 @@ class axioms:
         impl_0 = (v, u, u) in self.stepfunction_set
 
         if cond_0 and not impl_0:
-            print("VIOLATE (A)")
-            print("u ->", u, ", x ->", x, ", v ->", v)
-            print(tp(u, v, x), elem(), T(), nimplies(), tp(v, u, u), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (A)")
+                print("u ->", u, ", x ->", x, ", v ->", v)
+                print(tp(u, v, x), elem(), T(), nimplies(), tp(v, u, u), elem(), T())
+                print("---")
             return False
         return True
 
-    def B(self, u, v, x):
+    def B(self, u, v, x, print_info=True):
         # If(u, v, x) ∈ T
         # then(v, u, x) /∈ T
         # for all u, v, x ∈ V
@@ -38,15 +39,16 @@ class axioms:
         impl_0 = (v, u, x) not in self.stepfunction_set
 
         if cond_0 and not impl_0:
-            print("VIOLATE (B)")
-            print("u ->", u, ", x ->", x, ", v ->", v)
-            print(tp(u, v, x), elem(), T(), nimplies(), tp(v, u, x), nelem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (B)")
+                print("u ->", u, ", x ->", x, ", v ->", v)
+                print(tp(u, v, x), elem(), T(), nimplies(), tp(v, u, x), nelem(), T())
+                print("---")
             return False
         return True
 
 
-    def H(self, u, v):
+    def H(self, u, v, print_info=True):
         # If
         # u̸ = v
         # then
@@ -63,14 +65,15 @@ class axioms:
         impl_0 = len(x_set) >= 1
 
         if cond_0 and not impl_0:
-            print("VIOLATE (H)")
-            print("u ->", u, ", v", "->", v)
-            print(u, neq(), v, nimplies(), exists(), "x", "such that", tp(u, "x", v), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (H)")
+                print("u ->", u, ", v", "->", v)
+                print(u, neq(), v, nimplies(), exists(), "x", "such that", tp(u, "x", v), elem(), T())
+                print("---")
             return False
         return True
 
-    def C(self, u, v, x, y):
+    def C(self, u, v, x, y, print_info=True):
         # If(u, v, x) ∈ T and (x, y, v) ∈ T
         # then(x, y, u) ∈ T;
         cond_0 = (u, v, x) in self.stepfunction_set
@@ -79,16 +82,17 @@ class axioms:
         impl_0 = (x, y, u) in self.stepfunction_set
 
         if (cond_0 and cond_1) and not impl_0:
-            print("VIOLATE (C)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, v, x), elem(), T(), aand(), tp(x, y, v), elem(), T(),
-                  nimplies(), tp(x, y, u), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (C)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, v, x), elem(), T(), aand(), tp(x, y, v), elem(), T(),
+                      nimplies(), tp(x, y, u), elem(), T())
+                print("---")
             return False
         return True
 
 
-    def D(self, u, v, x, y):
+    def D(self, u, v, x, y, print_info=True):
         # If(u, v, x) ∈ T and (x, y, v) ∈ T
         # then(u, v, y) ∈ T
 
@@ -98,15 +102,16 @@ class axioms:
         impl_0 = (u, v, y) in self.stepfunction_set
 
         if (cond_0 and cond_1) and not impl_0:
-            print("VIOLATE (D)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, v, x), elem(), T(), aand(), tp(x, y, v), elem(), T(),
-                  nimplies(), tp(u, v, y), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (D)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, v, x), elem(), T(), aand(), tp(x, y, v), elem(), T(),
+                      nimplies(), tp(u, v, y), elem(), T())
+                print("---")
             return False
         return True
 
-    def F(self, u, v, x, y):
+    def F(self, u, v, x, y, print_info=True):
         # If(u, v, x) ∈ T, (v, u, y) ∈ T, and (x, y, y) ∈ T
         # then(x, y, u) ∈ T
         cond_0 = (u, v, x) in self.stepfunction_set
@@ -116,16 +121,17 @@ class axioms:
         impl_0 = (x, y, u) in self.stepfunction_set
 
         if (cond_0 and cond_1 and cond_2) and not impl_0:
-            print("VIOLATE (F)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, v, x), elem(), T(), aand(), tp(v, u, y), aand(), tp(x, y, y), elem(), T(),
-                  nimplies(), tp(x, y, u), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (F)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, v, x), elem(), T(), aand(), tp(v, u, y), aand(), tp(x, y, y), elem(), T(),
+                      nimplies(), tp(x, y, u), elem(), T())
+                print("---")
             return False
         return True
 
 
-    def G(self, u, v, x, y):
+    def G(self, u, v, x, y, print_info=True):
         # If(u, v, x) ∈ T and (x, y, y) ∈ T
         # then(x, y, u) ∈ T or (y, x, v) ∈ T or (u, v, y) ∈ T
         cond_0 = (u, v, x) in self.stepfunction_set
@@ -136,17 +142,18 @@ class axioms:
         impl_2 = (u, v, y) in self.stepfunction_set
 
         if (cond_0 and cond_1) and not (impl_0 or impl_1 or impl_2):
-            print("VIOLATE (G)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, v, x), elem(), T(), aand(), tp(x, y, y), elem(), T(),
-                  nimplies(), tp(x, y, y), elem(), T(),
-                  oor(), tp(y, x, v), elem(), T(),
-                  oor(), tp(u, v, y), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (G)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, v, x), elem(), T(), aand(), tp(x, y, y), elem(), T(),
+                      nimplies(), tp(x, y, y), elem(), T(),
+                      oor(), tp(y, x, v), elem(), T(),
+                      oor(), tp(u, v, y), elem(), T())
+                print("---")
             return False
         return True
 
-    def E(self, u, v, x, y):
+    def E(self, u, v, x, y, print_info=True):
         # If(u, v, x) ∈ T and (u, y, v) ∈ T
         # then
         # y = v
@@ -156,15 +163,16 @@ class axioms:
         impl_0 = y == v
 
         if (cond_0 and cond_1) and not impl_0:
-            print("VIOLATE (E)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, v, x), elem(), T(), aand(), tp(u, y, v), elem(), T(),
-                  nimplies(), y, eq(), v)
-            print("---")
+            if print_info:
+                print("VIOLATE (E)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, v, x), elem(), T(), aand(), tp(u, y, v), elem(), T(),
+                      nimplies(), y, eq(), v)
+                print("---")
             return False
         return True
 
-    def Pt(self, u, v, x, y):
+    def Pt(self, u, v, x, y, print_info=True):
         # (u, v, x) ∈ T and (v, x, y) ∈ T
         # implies
         # that
@@ -175,16 +183,17 @@ class axioms:
         impl_0 = (u, v, y) in self.stepfunction_set
 
         if (cond_0 and cond_1) and not impl_0:
-            print("VIOLATE (Pt)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, v, x), elem(), T(), aand(), tp(v, x, y), elem(), T(),
-                  nimplies(), tp(u, v, y), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Pt)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, v, x), elem(), T(), aand(), tp(v, x, y), elem(), T(),
+                      nimplies(), tp(u, v, y), elem(), T())
+                print("---")
             return False
         return True
 
 
-    def Dd(self, u, v, w, x, y, z, d):
+    def Dd(self, u, v, w, x, y, z, d, print_info=True):
         # (x, d, v) ∈ T, (u, d, v) ∈ T, (y, d, v) ∈ T,
         # (z, d, u) ∈ T, (v, d, u) ∈ T, (w, d, u) ∈ T
         # implies
@@ -201,17 +210,18 @@ class axioms:
         impl_1 = (z, v, w) not in self.stepfunction_set
 
         if (cond_0 and cond_1 and cond_2 and cond_3 and cond_4 and cond_5) and not (impl_0 or impl_1):
-            print("VIOLATE (Dd)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y, ", z", "->", z, ", d", "->", d)
-            print(tp(x, d, v), elem(), T(), aand(), tp(u, d, v), elem(), T(),
-                  tp(y, d, v), elem(), T(), aand(), tp(z, d, u), elem(), T(),
-                  tp(v, d, u), elem(), T(), aand(), tp(w, d, u), elem(), T(),
-                  nimplies(), tp(x, u, y), nelem(), T(), oor(), tp(z, v, w), nelem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Dd)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y, ", z", "->", z, ", d", "->", d)
+                print(tp(x, d, v), elem(), T(), aand(), tp(u, d, v), elem(), T(),
+                      tp(y, d, v), elem(), T(), aand(), tp(z, d, u), elem(), T(),
+                      tp(v, d, u), elem(), T(), aand(), tp(w, d, u), elem(), T(),
+                      nimplies(), tp(x, u, y), nelem(), T(), oor(), tp(z, v, w), nelem(), T())
+                print("---")
             return False
         return True
 
-    def Dt(self, u, v, x, y, z):
+    def Dt(self, u, v, x, y, z, print_info=True):
         # (x, u, v) ∈ T, (y, u, v) ∈ T and (z, u, v) ∈ T
         # implies
         # that(x, y, z) /∈ T
@@ -222,15 +232,16 @@ class axioms:
         impl_0 = (x, z, v) not in self.stepfunction_set
 
         if (cond_0 and cond_1 and cond_2) and not impl_0:
-            print("VIOLATE (Dt)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y, ", z", "->", z)
-            print(tp(x, u, v), elem(), T(), aand(), tp(y, u, v), elem(), T(), tp(z, u, v), elem(), T(),
-                  nimplies(), tp(x, z, v), nelem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Dt)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y, ", z", "->", z)
+                print(tp(x, u, v), elem(), T(), aand(), tp(y, u, v), elem(), T(), tp(z, u, v), elem(), T(),
+                      nimplies(), tp(x, z, v), nelem(), T())
+                print("---")
             return False
         return True
 
-    def Cw(self, u, v, x, y):
+    def Cw(self, u, v, x, y, print_info=True):
         # (u, v, x) ∈ T, (u, v, y) ∈ T
         # implies
         # that(x, v, y) /∈ T.
@@ -240,16 +251,17 @@ class axioms:
         impl_0 = (x, v, y) not in self.stepfunction_set
 
         if (cond_0 and cond_1) and not impl_0:
-            print("VIOLATE (Cw)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, v, x), elem(), T(), aand(), tp(u, v, y), elem(), T(),
-                  nimplies(), tp(x, y, v), nelem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Cw)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, v, x), elem(), T(), aand(), tp(u, v, y), elem(), T(),
+                      nimplies(), tp(x, y, v), nelem(), T())
+                print("---")
             return False
         return True
 
 
-    def Cb(self, u, v, w, x, y):
+    def Cb(self, u, v, w, x, y, print_info=True):
         # (u, x, v) ∈ T, (u, y, w) ∈ T, (w, y, x) ∈
         # T, (v, x, y) ∈ T
         # implies
@@ -262,17 +274,18 @@ class axioms:
         impl_0 = (x, u, y) in self.stepfunction_set
 
         if (cond_0 and cond_1 and cond_2 and cond_3) and not (impl_0):
-            print("VIOLATE (Cb)")
-            print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y, ", w ->", w)
-            print(tp(u, x, v), elem(), T(), aand(), tp(u, y, w), elem(), T(),
-                  aand(), tp(w, y, x), elem(), T(), aand(), tp(v, x, y), elem(), T(),
-                  nimplies(), tp(x, u, y), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Cb)")
+                print("u ->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y, ", w ->", w)
+                print(tp(u, x, v), elem(), T(), aand(), tp(u, y, w), elem(), T(),
+                      aand(), tp(w, y, x), elem(), T(), aand(), tp(v, x, y), elem(), T(),
+                      nimplies(), tp(x, u, y), elem(), T())
+                print("---")
             return False
         return True
 
 
-    def Dm(self, u, v, x, y):
+    def Dm(self, u, v, x, y, print_info=True):
         # (u, x, v) ∈ T, (v, x, u) ∈ T,
         # (u, y, v) ∈ T, (v, y, u) ∈ T
         # implies
@@ -285,16 +298,17 @@ class axioms:
         impl_0 = (x, y, y) not in self.stepfunction_set
 
         if (cond_0 and cond_1 and cond_2 and cond_3) and not (impl_0):
-            print("VIOLATE (Dm)")
-            print("u ", "->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
-            print(tp(u, x, v), elem(), T(), aand(), tp(v, x, u), elem(), T(),
-                  aand(), tp(u, y, v), elem(), T(), aand(), tp(v, y, u), elem(), T(),
-                  nimplies(), tp(x, y, y), nelem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Dm)")
+                print("u ", "->", u, ", v", "->", v, ", x", "->", x, ", y", "->", y)
+                print(tp(u, x, v), elem(), T(), aand(), tp(v, x, u), elem(), T(),
+                      aand(), tp(u, y, v), elem(), T(), aand(), tp(v, y, u), elem(), T(),
+                      nimplies(), tp(x, y, y), nelem(), T())
+                print("---")
             return False
         return True
 
-    def T1(self, x, y, t):
+    def T1(self, x, y, t, print_info=True):
         # If
         # x̸ = y
         # then
@@ -312,14 +326,15 @@ class axioms:
         impl_0 = len(impl_0_set) <= 1
 
         if cond_0 and not impl_0:
-            print("VIOLATE (T1)")
-            print("x", "->", x, ", y", "->", y)
-            print(x, neq(), y, nimplies(), exists() + "!", "t such that", tp(x, "t", y), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (T1)")
+                print("x", "->", x, ", y", "->", y)
+                print(x, neq(), y, nimplies(), exists() + "!", "t such that", tp(x, "t", y), elem(), T())
+                print("---")
             return False
         return True
 
-    def T2(self, x, y, z):
+    def T2(self, x, y, z, print_info=True):
         # If(x, y, y) ∈ T, then(x, y, z) or (y, x, z) ∈ T
         cond_0 = (x, y, y) in self.stepfunction_set
 
@@ -327,15 +342,16 @@ class axioms:
         impl_1 = (y, x, z) in self.stepfunction_set
 
         if (cond_0) and not (impl_0 or impl_1):
-            print("VIOLATE (T2)")
-            print("x ", "->", x, ", y", "->", y, ", z", "->", z)
-            print(tp(x, y, y), elem(), T(),
-                  nimplies(), tp(x, y, z), elem(), T(), oor(), tp(y, x, z), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (T2)")
+                print("x ", "->", x, ", y", "->", y, ", z", "->", z)
+                print(tp(x, y, y), elem(), T(),
+                      nimplies(), tp(x, y, z), elem(), T(), oor(), tp(y, x, z), elem(), T())
+                print("---")
             return False
         return True
 
-    def Tb2(self, x, y, z, vertices):
+    def Tb2(self, x, y, z, vertices, print_info=True):
         # If(x, y, y) ∈ T, then(x, y, z), or (y, x, z) ∈ T, or there
         # exists
         # w
@@ -353,17 +369,18 @@ class axioms:
                 impl_2 = True
 
         if (cond_0) and not (impl_0 or impl_1 or impl_2):
-            print("VIOLATE (Tb2)")
-            print("x ", "->", x, ", y", "->", y, ", z", "->", z)
-            print(tp(x, y, y), elem(), T(),
-                  nimplies(), tp(x, y, z), elem(), T(), oor(), tp(y, x, z), elem(), T(),
-                  oor(), exists(), "w", "such that", tp(x, "w", y), elem(), T(),
-                  aand(), tp(x, "w", x), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Tb2)")
+                print("x ", "->", x, ", y", "->", y, ", z", "->", z)
+                print(tp(x, y, y), elem(), T(),
+                      nimplies(), tp(x, y, z), elem(), T(), oor(), tp(y, x, z), elem(), T(),
+                      oor(), exists(), "w", "such that", tp(x, "w", y), elem(), T(),
+                      aand(), tp(x, "w", x), elem(), T())
+                print("---")
             return False
         return True
 
-    def P4(self, u, v, x, y):
+    def P4(self, u, v, x, y, print_info=True):
         # (u, x, y) ∈ T and (x, y, v) ∈ T
         # implies(u, v, v) ∈ T.
         cond_0 = (u, x, y) in self.stepfunction_set
@@ -372,15 +389,16 @@ class axioms:
         impl_0 = (u, v, v) in self.stepfunction_set
 
         if (cond_0 and cond_1) and not (impl_0):
-            print("VIOLATE (Tb2)")
-            print("u ", "->", u, ", x", "->", x, ", y", "->", y, ", v", "->", v)
-            print(tp(u, x, y), elem(), T(), aand(), tp(x, y, v), elem(), T(),
-                  nimplies(), tp(u, v, v), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Tb2)")
+                print("u ", "->", u, ", x", "->", x, ", y", "->", y, ", v", "->", v)
+                print(tp(u, x, y), elem(), T(), aand(), tp(x, y, v), elem(), T(),
+                      nimplies(), tp(u, v, v), elem(), T())
+                print("---")
             return False
         return True
 
-    def Sm(self, u, v, w, x, y, z):
+    def Sm(self, u, v, w, x, y, z, print_info=True):
         #         (v, w, x) in T, (v, w, z) in T, (x, y, z) in T
         #         implies (v, w, y) in T
         cond_0 = (v, w, x) in self.stepfunction_set
@@ -390,11 +408,12 @@ class axioms:
         impl_0 = (v, w, y) in self.stepfunction_set
 
         if (cond_0 and cond_1 and cond_2) and not (impl_0):
-            print("VIOLATE (Sm)")
-            print("u ", "->", u, ", v", "->", v, ", w", "->", w, ", x", "->", x, ", y", "->", y, ", z", "->", z)
-            print(tp(v, w, x), elem(), T(), aand(), tp(v, w, z), elem(), T(), aand(), tp(x, y, z), elem(), T(),
-                  nimplies(), tp(v, w, y), elem(), T())
-            print("---")
+            if print_info:
+                print("VIOLATE (Sm)")
+                print("u ", "->", u, ", v", "->", v, ", w", "->", w, ", x", "->", x, ", y", "->", y, ", z", "->", z)
+                print(tp(v, w, x), elem(), T(), aand(), tp(v, w, z), elem(), T(), aand(), tp(x, y, z), elem(), T(),
+                      nimplies(), tp(v, w, y), elem(), T())
+                print("---")
             return False
         return True
 
