@@ -366,6 +366,8 @@ class stepfunction:
                                     sat = self.axioms.Sm(u, v, w, x, y, z, print_info=print_info)
                                     sat_list[ax_choice.index("Sm")] = min(sat_list[ax_choice.index("Sm")], sat)
 
+        return sat_list
+
 
     def check_additional(self):
         test_stepfunction = graph_to_step(self.graph)

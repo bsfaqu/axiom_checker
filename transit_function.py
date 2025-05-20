@@ -426,6 +426,8 @@ class transit_function:
                                 sat_val = self.axioms.rv(u, x, y, v, print_info=print_info)
                                 sat_list[ax_choice.index("rv")] = min(sat_list[ax_choice.index("rv")], sat_val)
 
+        return sat_list
+
     def check_additional(self):
 
         # Initialize some vars for graphic check
