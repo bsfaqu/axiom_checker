@@ -463,6 +463,46 @@ class transit_function:
                                 sat_val = self.axioms.rv(u, x, y, v, print_info=print_info)
                                 sat_list[ax_choice.index("rv")] = min(sat_list[ax_choice.index("rv")], sat_val)
 
+        if "graphic" in ax_choice:
+            is_graphic = True
+            graphic_violating_sets = dict()
+
+            # Compare each transit set to the interval function of G_R
+            for k in self.transit_function:
+                curr_transit_set = self.transit_function[k]
+
+                # Get all shortest paths
+                try:
+                    paths = list(nx.all_shortest_paths(self.graph, source=k[0], target=k[1]))
+                except nx.NetworkXNoPath:
+                    continue
+
+                path_curr_set = set()
+
+                # Add all vertices along shortest path to set
+                for path in paths:
+                    path_curr_set.update(set(path))
+
+                # Compare I_{G_R}(u, v) with R(u,v)
+                if path_curr_set != curr_transit_set:
+                    is_graphic = False
+                    graphic_violating_sets[k] = path_curr_set
+
+            # Output if R is graphic
+            if not is_graphic:
+                if print_info:
+                    print("Given transit function is NOT graphic as R", neq(), "I_{G_R}.")
+                    print("Violating transit sets:")
+                    for k in graphic_violating_sets:
+                        print(r(k[0], k[1]), " ", eq(), " ", sstr(self.transit_function[k]), " ", neq(), " ",
+                              sstr(graphic_violating_sets[k]), " ", eq(), " I(",
+                              str(k[0]).replace("'", ""), ",", str(k[1]).replace("'", ""), ")", sep="")
+                sat_list[ax_choice.index("graphic")] = min(sat_list[ax_choice.index("graphic")], False)
+            # In the negative case also output the violating pairs
+            else:
+                if print_info:
+                    print("Given transit function is not graphic, hence R=I_{G_R}.")
+
         return sat_list
 
 

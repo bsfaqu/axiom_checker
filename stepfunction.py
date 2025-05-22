@@ -409,6 +409,25 @@ class stepfunction:
                                     sat = self.axioms.Sm(u, v, w, x, y, z, print_info=print_info)
                                     sat_list[ax_choice.index("Sm")] = min(sat_list[ax_choice.index("Sm")], sat)
 
+        if "graphic" in ax_choice:
+            test_stepfunction = graph_to_step(self.graph)
+
+            t_in_graph_not_in_sf = []
+            t_in_sf_not_in_graph = []
+
+            for t in test_stepfunction:
+                if t not in self.stepfunction_set:
+                    t_in_graph_not_in_sf += [t]
+
+            for t in self.stepfunction_set:
+                if t not in test_stepfunction:
+                    t_in_sf_not_in_graph += [t]
+
+            if len(t_in_graph_not_in_sf) != 0 or len(t_in_sf_not_in_graph) != 0:
+                if print_info:
+                    print("The step system of G_T not equal to the step function provided.")
+                sat_list[ax_choice.index("graphic")] = False
+
         return sat_list
 
 

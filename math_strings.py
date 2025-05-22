@@ -63,7 +63,7 @@ def r(u, v):
 def sstr(A):
     list_A = list(A)
     list_A = sorted(list_A)
-    if A == set():
+    if len(A) == 0:
         return emptyset()
     set_string = "{"
     for elem in A:
