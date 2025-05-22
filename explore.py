@@ -366,232 +366,21 @@ if not no_file:
     else:
         pass
 
-else:
-    if random_graphs:
-        print("Checking Random Graphs with", num_nodes, "vertices.")
-        print("-----------------------------------")
+elif random_graphs:
+    print("Checking Random Graphs with", num_nodes, "vertices.")
+    print("-----------------------------------")
 
-        if signpost:
+    if signpost:
 
-            counter = 0
+        counter = 0
 
-            for edge_prob in probabilities:
+        for edge_prob in probabilities:
 
-                print()
-                print("Checking edge probabiliy", edge_prob, "...")
-                print("--------------------------------")
+            print()
+            print("Checking edge probabiliy", edge_prob, "...")
+            print("--------------------------------")
 
-                for i in range(num_tries):
-
-                    if counter % 100 == 0:
-                        print()
-                        print(counter, "graphs checked ...")
-
-                    counter += 1
-
-                    graph = get_random_graph(num_nodes, edge_prob)
-                    vertices = list(graph.nodes())
-
-                    stepfunction_set = graph_to_step(graph)
-
-                    fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_set, vertices, signpost)
-
-                    # print("Fits?", fits_axioms)
-
-                    if fits_axioms:
-                        print()
-                        print("Nodes:", sstr(vertices))
-                        print("Edges:", sstr(list(graph.edges())))
-                        print("Stepfunction:", sstr(stepfunction_set))
-                        if write_output:
-                            save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
-                        valid_graphs += 1
-
-        else:
-            counter = 0
-
-            for edge_prob in probabilities:
-                print()
-                print("Checking edge probabiliy", edge_prob, "...")
-                print("--------------------------------")
-                print()
-                for i in range(num_tries):
-
-                    if counter % 100 == 0:
-                        print()
-                        print(counter, "graphs checked ...")
-
-                    counter += 1
-
-                    graph = get_random_digraph(num_nodes, edge_prob)
-                    vertices = list(graph.nodes())
-
-                    transit_function_test = graph_to_transit(graph)
-
-                    fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, transit_function_test, vertices, signpost)
-
-                    # print(sstr(list(graph.edges())))
-                    # print(vertices)
-                    # print(edge_prob)
-                    # print("FITS", fits_axioms)
-                    # input()
-
-
-                    if fits_axioms:
-                        print()
-                        print("Nodes:", sstr(vertices))
-                        print("Edges:", sstr(list(graph.edges())))
-                        print("Transit Function:", transit_function_test)
-                        if write_output:
-                            save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
-                            save_transit_function(transit_function_dict_copy, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
-                        valid_graphs += 1
-
-    elif random_function:
-
-        print("Checking Random Functions on", num_nodes, "vertices.")
-        print("-----------------------------------")
-
-        if signpost:
-
-            triple_list = set()
-
-            vertices = [i for i in range(num_nodes)]
-
-            for u in vertices:
-                for v in vertices:
-                    for w in vertices:
-                        if u == w or u == v:
-                            continue
-                        triple_list.update({(u, v, w)})
-
-            counter = 0
-
-            for tprob in probabilities:
-
-                print()
-                print("Checking tuple probabiliy", tprob, "...")
-                print("--------------------------------")
-                print()
-
-                for i in range(num_tries):
-
-                    if counter % 100 == 0:
-                        print()
-                        print(counter, "graphs checked ...")
-
-                    counter += 1
-
-                    triple_selection = []
-
-                    for t in triple_list:
-                        thresh = random.random()
-
-                        if thresh <= tprob:
-                            triple_selection += [t]
-
-                    stepfunction_set = triple_selection
-
-                    # input(stepfunction_set)
-
-                    fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_set, vertices, signpost)
-
-                    if fits_axioms:
-                        graph = step_to_graph(stepfunction_set)
-
-                        print()
-                        print("Nodes:", sstr(vertices))
-                        print("Edges:", sstr(list(graph.edges())))
-                        print("Stepfunction:", sstr(stepfunction_set))
-                        if write_output:
-                            save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
-                            save_step_function(stepfunction_set, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
-                        valid_graphs += 1
-        else:
-            vertices = [i for i in range(num_nodes)]
-
-            counter = 0
-
-            transit_function_dict = dict()
-
-            for u in vertices:
-                for v in vertices:
-                    if u == v:
-                        transit_function_dict[(u, v)] = {u}
-                    else:
-                        transit_function_dict[(u, v)] = set()
-
-            for tprob in probabilities:
-
-                print()
-                print("Checking transit set probability", tprob, "...")
-                print("--------------------------------")
-                print()
-
-                for i in range(num_tries):
-
-                    if counter % 100 == 0:
-                        print()
-                        print(counter, "graphs checked ...")
-
-                    counter += 1
-
-                    transit_function_dict_copy = copy.copy(transit_function_dict)
-
-                    for u in vertices:
-                        for v in vertices:
-                            if u == v:
-                                continue
-
-                            vertex_selection = []
-
-                            added = False
-
-                            for w in vertices:
-                                thresh = random.random()
-                                if thresh <= tprob:
-                                    added = True
-                                    vertex_selection += [w]
-
-                            transit_function_dict_copy[(u, v)] = transit_function_dict_copy[(u, v)].union(vertex_selection)
-
-                            if u not in transit_function_dict_copy[(u, v)] and added:
-                                transit_function_dict_copy[(u, v)] = transit_function_dict_copy[(u, v)].union([u])
-                            if v not in transit_function_dict_copy[(u, v)] and added:
-                                transit_function_dict_copy[(u, v)] = transit_function_dict_copy[(u, v)].union([v])
-
-                    fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, transit_function_dict_copy, vertices,
-                                                 signpost)
-
-                    # print(sstr(list(graph.edges())))
-                    # print(vertices)
-                    # print(edge_prob)
-                    # print("FITS", fits_axioms)
-                    # input()
-
-                    if fits_axioms:
-                        graph = transit_to_graph(transit_function_dict_copy)
-                        print()
-                        print("Nodes:", sstr(vertices))
-                        print("Edges:", sstr(list(graph.edges())))
-                        print("Transit Function:", transit_function_dict_copy)
-                        if write_output:
-                            save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
-                            save_transit_function(transit_function_dict_copy, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
-                        valid_graphs += 1
-
-    else:
-
-        print("Checking all graphs up to 7 vertices.")
-        print("-----------------------------------")
-
-        graph_atlas = nx.graph_atlas_g()
-
-        if signpost:
-
-            counter = 0
-
-            for graph in graph_atlas:
+            for i in range(num_tries):
 
                 if counter % 100 == 0:
                     print()
@@ -599,11 +388,14 @@ else:
 
                 counter += 1
 
+                graph = get_random_graph(num_nodes, edge_prob)
                 vertices = list(graph.nodes())
 
                 stepfunction_set = graph_to_step(graph)
 
                 fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_set, vertices, signpost)
+
+                # print("Fits?", fits_axioms)
 
                 if fits_axioms:
                     print()
@@ -612,15 +404,17 @@ else:
                     print("Stepfunction:", sstr(stepfunction_set))
                     if write_output:
                         save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
-                        save_transit_function(transit_function_dict_copy,
-                                              outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                     valid_graphs += 1
 
-        elif not signpost:
+    else:
+        counter = 0
 
-            counter = 0
-
-            for graph in graph_atlas:
+        for edge_prob in probabilities:
+            print()
+            print("Checking edge probabiliy", edge_prob, "...")
+            print("--------------------------------")
+            print()
+            for i in range(num_tries):
 
                 if counter % 100 == 0:
                     print()
@@ -628,12 +422,19 @@ else:
 
                 counter += 1
 
+                graph = get_random_digraph(num_nodes, edge_prob)
                 vertices = list(graph.nodes())
 
                 transit_function_test = graph_to_transit(graph)
 
-                fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, transit_function_test, vertices,
-                                             signpost)
+                fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, transit_function_test, vertices, signpost)
+
+                # print(sstr(list(graph.edges())))
+                # print(vertices)
+                # print(edge_prob)
+                # print("FITS", fits_axioms)
+                # input()
+
 
                 if fits_axioms:
                     print()
@@ -644,6 +445,204 @@ else:
                         save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
                         save_transit_function(transit_function_test, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                     valid_graphs += 1
+
+elif random_function:
+
+    print("Checking Random Functions on", num_nodes, "vertices.")
+    print("-----------------------------------")
+
+    if signpost:
+
+        triple_list = set()
+
+        vertices = [i for i in range(num_nodes)]
+
+        for u in vertices:
+            for v in vertices:
+                for w in vertices:
+                    if u == w or u == v:
+                        continue
+                    triple_list.update({(u, v, w)})
+
+        counter = 0
+
+        for tprob in probabilities:
+
+            print()
+            print("Checking tuple probabiliy", tprob, "...")
+            print("--------------------------------")
+            print()
+
+            for i in range(num_tries):
+
+                if counter % 100 == 0:
+                    print()
+                    print(counter, "graphs checked ...")
+
+                counter += 1
+
+                triple_selection = []
+
+                for t in triple_list:
+                    thresh = random.random()
+
+                    if thresh <= tprob:
+                        triple_selection += [t]
+
+                stepfunction_set = triple_selection
+
+                # input(stepfunction_set)
+
+                fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_set, vertices, signpost)
+
+                if fits_axioms:
+                    graph = step_to_graph(stepfunction_set)
+
+                    print()
+                    print("Nodes:", sstr(vertices))
+                    print("Edges:", sstr(list(graph.edges())))
+                    print("Stepfunction:", sstr(stepfunction_set))
+                    if write_output:
+                        save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                        save_step_function(stepfunction_set, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
+                    valid_graphs += 1
+    else:
+        vertices = [i for i in range(num_nodes)]
+
+        counter = 0
+
+        transit_function_dict = dict()
+
+        for u in vertices:
+            for v in vertices:
+                if u == v:
+                    transit_function_dict[(u, v)] = {u}
+                else:
+                    transit_function_dict[(u, v)] = set()
+
+        for tprob in probabilities:
+
+            print()
+            print("Checking transit set probability", tprob, "...")
+            print("--------------------------------")
+            print()
+
+            for i in range(num_tries):
+
+                if counter % 100 == 0:
+                    print()
+                    print(counter, "graphs checked ...")
+
+                counter += 1
+
+                transit_function_dict_copy = copy.copy(transit_function_dict)
+
+                for u in vertices:
+                    for v in vertices:
+                        if u == v:
+                            continue
+
+                        vertex_selection = []
+
+                        added = False
+
+                        for w in vertices:
+                            thresh = random.random()
+                            if thresh <= tprob:
+                                added = True
+                                vertex_selection += [w]
+
+                        transit_function_dict_copy[(u, v)] = transit_function_dict_copy[(u, v)].union(vertex_selection)
+
+                        if u not in transit_function_dict_copy[(u, v)] and added:
+                            transit_function_dict_copy[(u, v)] = transit_function_dict_copy[(u, v)].union([u])
+                        if v not in transit_function_dict_copy[(u, v)] and added:
+                            transit_function_dict_copy[(u, v)] = transit_function_dict_copy[(u, v)].union([v])
+
+                fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, transit_function_dict_copy, vertices,
+                                             signpost)
+
+                # print(sstr(list(graph.edges())))
+                # print(vertices)
+                # print(edge_prob)
+                # print("FITS", fits_axioms)
+                # input()
+
+                if fits_axioms:
+                    graph = transit_to_graph(transit_function_dict_copy)
+                    print()
+                    print("Nodes:", sstr(vertices))
+                    print("Edges:", sstr(list(graph.edges())))
+                    print("Transit Function:", transit_function_dict_copy)
+                    if write_output:
+                        save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                        save_transit_function(transit_function_dict_copy, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
+                    valid_graphs += 1
+
+else:
+
+    print("Checking all graphs up to 7 vertices.")
+    print("-----------------------------------")
+
+    graph_atlas = nx.graph_atlas_g()
+
+    if signpost:
+
+        counter = 0
+
+        for graph in graph_atlas:
+
+            if counter % 100 == 0:
+                print()
+                print(counter, "graphs checked ...")
+
+            counter += 1
+
+            vertices = list(graph.nodes())
+
+            stepfunction_set = graph_to_step(graph)
+
+            fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_set, vertices, signpost)
+
+            if fits_axioms:
+                print()
+                print("Nodes:", sstr(vertices))
+                print("Edges:", sstr(list(graph.edges())))
+                print("Stepfunction:", sstr(stepfunction_set))
+                if write_output:
+                    save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                    save_step_function(stepfunction_set,
+                                          outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
+                valid_graphs += 1
+
+    elif not signpost:
+
+        counter = 0
+
+        for graph in graph_atlas:
+
+            if counter % 100 == 0:
+                print()
+                print(counter, "graphs checked ...")
+
+            counter += 1
+
+            vertices = list(graph.nodes())
+
+            transit_function_test = graph_to_transit(graph)
+
+            fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, transit_function_test, vertices,
+                                         signpost)
+
+            if fits_axioms:
+                print()
+                print("Nodes:", sstr(vertices))
+                print("Edges:", sstr(list(graph.edges())))
+                print("Transit Function:", transit_function_test)
+                if write_output:
+                    save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                    save_transit_function(transit_function_test, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
+                valid_graphs += 1
 
 
 

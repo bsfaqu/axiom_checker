@@ -114,6 +114,8 @@ def save_transit_function(transit_function, outfile, vertices):
     with open(outfile, "w+") as f:
         f.write(out_string)
 
+    print("Saved transit function .tsv to", outfile)
+
 def save_step_function(stepfunction, outfile, vertices):
     vertices = list(vertices)
 
@@ -139,3 +141,5 @@ def save_step_function(stepfunction, outfile, vertices):
     out_string = out_string[0:-1]
     with open(outfile, "w+") as f:
         f.write(out_string)
+
+    print("Saved step function .tsv to", outfile)
