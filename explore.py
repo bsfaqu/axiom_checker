@@ -10,6 +10,7 @@ from graph_tools import *
 import random
 import stepfunction
 import transit_function
+import itertools as it
 
 def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, signpost=False):
 
@@ -253,8 +254,117 @@ print(num_tries)
 valid_graphs = 0
 
 if not no_file:
-    # TODO Randomly check adjacent transit functions with depth at most 2 for provided SP/TF.
-    pass
+
+    if signpost:
+
+        try:
+            # Read input file
+            with open(csv_file, "r") as f:
+                csv_str = f.read()
+
+            # Get the lines
+            csv_lines = csv_str.split("\n")
+
+            # Parse vertices from the first line
+            vertices = csv_lines[0].split("\t")[1::]
+        except Exception as e:
+            print()
+            print("Something went wrong reading the .tsv file. Reading the file and parsing the vertices "
+                  "produced the following exception:")
+            raise
+
+        stepfunction_obj = stepfunction.stepfunction(csv_lines)
+        stepfunction_set = stepfunction_obj.get_stepfunction()
+
+        stepfunction_delete_set = copy.copy(stepfunction_set)
+        stepfunction_delete_set.update({"*"})
+
+        triple_list = set()
+
+        vertices = stepfunction_obj.get_vertices()
+
+        for u in vertices:
+            for v in vertices:
+                for w in vertices:
+                    if u == w or u == v:
+                        continue
+                    triple_list.update({(u, v, w)})
+
+        triple_list.update({"*"})
+
+        for s in stepfunction_set:
+            triple_list.remove(s)
+
+        alterations = it.product(triple_list, triple_list, stepfunction_delete_set, stepfunction_delete_set)
+
+        print()
+        print("Altering the provided step function ... ")
+
+        for a in alterations:
+            stepfunction_test = copy.copy(stepfunction_set)
+
+            t_add_0 = a[0]
+            t_add_1 = a[1]
+            t_delete_0 = a[2]
+            t_delete_1 = a[3]
+
+            if t_add_0 == t_add_1 and t_add_0 != "*":
+                continue
+
+            if t_delete_0 == t_delete_1 and t_delete_0 != "*":
+                continue
+
+            if t_add_0 in [t_delete_0, t_delete_1] and t_add_0 != "*":
+                continue
+
+            if t_add_1 in [t_delete_0, t_delete_1] and t_add_1 != "*":
+                continue
+
+            if t_add_0 != "*":
+                stepfunction_test.update({t_add_0})
+
+            if t_add_1 != "*":
+                stepfunction_test.update({t_add_1})
+
+            if t_delete_0 != "*":
+                try:
+                    stepfunction_test.remove(t_delete_0)
+                except:
+                    pass
+
+            if t_delete_0 != "*":
+                try:
+                    stepfunction_test.remove(t_delete_0)
+                except:
+                    pass
+
+            # print()
+            # print("ADD", t_add_0)
+            # print("ADD", t_add_1)
+            # print("DELETE", t_delete_0)
+            # print("DELETE", t_delete_1)
+            # print("ORIGINAL STEPSYSTEM", stepfunction_set)
+            # print("ALTERED STEPSYSTEM ", stepfunction_test)
+
+            fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_test, vertices, signpost)
+
+            # print("Fits?", fits_axioms)
+            # if t_delete_0 == "*" and t_delete_1 == "*" and t_add_0 == "*" and t_add_1 == "*":
+            #     input()
+
+            if fits_axioms:
+                print()
+                graph = step_to_graph(stepfunction_test)
+                print("Nodes:", sstr(vertices))
+                print("Edges:", sstr(list(graph.edges())))
+                print("Stepfunction:", sstr(stepfunction_test))
+                if write_output:
+                    save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                    save_step_function(stepfunction_test)
+                valid_graphs += 1
+
+    else:
+        pass
 
 else:
     if random_graphs:
@@ -334,6 +444,7 @@ else:
                         print("Transit Function:", transit_function_test)
                         if write_output:
                             save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                            save_transit_function(transit_function_dict_copy, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                         valid_graphs += 1
 
     elif random_function:
@@ -341,7 +452,6 @@ else:
         print("Checking Random Functions on", num_nodes, "vertices.")
         print("-----------------------------------")
 
-        valid_graphs = 0
         if signpost:
 
             triple_list = set()
@@ -476,7 +586,6 @@ else:
         print("-----------------------------------")
 
         graph_atlas = nx.graph_atlas_g()
-        valid_graphs = 0
 
         if signpost:
 
@@ -503,6 +612,8 @@ else:
                     print("Stepfunction:", sstr(stepfunction_set))
                     if write_output:
                         save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                        save_transit_function(transit_function_dict_copy,
+                                              outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                     valid_graphs += 1
 
         elif not signpost:
@@ -531,11 +642,14 @@ else:
                     print("Transit Function:", transit_function_test)
                     if write_output:
                         save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
+                        save_transit_function(transit_function_test, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                     valid_graphs += 1
 
 
 
-if signpost and no_file:
+if signpost:
+    print()
     print(valid_graphs, "explored step systems satisfied the constraints")
-elif not signpost and no_file:
+elif not signpost:
+    print()
     print(valid_graphs, "explored transit functions satisfied the constraints")

@@ -549,6 +549,9 @@ class transit_function:
     def get_transit_function(self):
         return self.transit_function
 
+    def get_vertices(self):
+        return self.vertices
+
     def get_axioms(self):
         return self.axioms
 

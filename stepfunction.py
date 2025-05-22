@@ -467,6 +467,11 @@ class stepfunction:
                 for t in t_in_sf_not_in_graph:
                     print(t)
 
+    def get_stepfunction(self):
+        return self.stepfunction_set
+
+    def get_vertices(self):
+        return self.vertices
 
     def save_graph(self, csv_file):
         # Drawing graph figure and saving it
