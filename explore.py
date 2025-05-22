@@ -18,8 +18,16 @@ def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, sign
 
         sf = stepfunction.stepfunction(stepfunction_set=check_object, vertices=vertices)
 
-        ax_answer_true = sf.check_axioms(ax_choice_true, print_info=False)
-        ax_answer_false = sf.check_axioms(ax_choice_false, print_info=False)
+        if ax_choice_true == ["X"]:
+            ax_answer_true = [True]
+        else:
+            ax_answer_true = sf.check_axioms(ax_choice_true, print_info=False)
+
+
+        if ax_choice_false == ["X"]:
+            ax_answer_false = [False]
+        else:
+            ax_answer_false = sf.check_axioms(ax_choice_false, print_info=False)
 
         # print("---")
         # print(check_object)
@@ -39,7 +47,10 @@ def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, sign
         tf = transit_function.transit_function(transit_function=check_object, vertices=vertices)
 
         ax_answer_true = tf.check_axioms(ax_choice_true, print_info=False)
-        ax_answer_false = tf.check_axioms(ax_choice_false, print_info=False)
+        if ax_choice_false == ["X"]:
+            ax_answer_false = [False]
+        else:
+            ax_answer_false = tf.check_axioms(ax_choice_false, print_info=False)
 
         # print("---")
         # print(check_object)
@@ -106,7 +117,7 @@ axiom_strings_transit = [
 axiom_strings_stepfunctions = [
     "A", "B", "H", "C", "D", "F", "G", "E",
     "Pt", "Dd", "Dt", "Cw", "Cb", "Dm", "T1",
-    "T2", "Tb2", "P4", "Sm", "graphic"
+    "T2", "Tb2", "P4", "Sm", "graphic", "X"
 ]
 
 signpost = False
@@ -591,6 +602,9 @@ else:
         counter = 0
 
         for graph in graph_atlas:
+
+            if num_nodes != 0 and len(graph.nodes()) < num_nodes:
+                continue
 
             if counter % 100 == 0:
                 print()
