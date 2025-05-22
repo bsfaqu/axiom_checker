@@ -258,6 +258,8 @@ if not no_file:
 
 else:
     if random_graphs:
+        print("Checking Random Graphs with", num_nodes, "vertices.")
+        print("-----------------------------------")
 
         if signpost:
 
@@ -335,6 +337,10 @@ else:
                         valid_graphs += 1
 
     elif random_function:
+
+        print("Checking Random Functions on", num_nodes, "vertices.")
+        print("-----------------------------------")
+
         valid_graphs = 0
         if signpost:
 
@@ -464,10 +470,11 @@ else:
                             save_transit_function(transit_function_dict_copy, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                         valid_graphs += 1
 
-
-
-
     else:
+
+        print("Checking all graphs up to 7 vertices.")
+        print("-----------------------------------")
+
         graph_atlas = nx.graph_atlas_g()
         valid_graphs = 0
 
