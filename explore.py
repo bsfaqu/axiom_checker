@@ -2,7 +2,7 @@ import copy
 
 import networkx as nx
 from matplotlib import pyplot as plt
-# from networkx.algorithms import isomorphism
+from networkx.algorithms import isomorphism
 import sys
 from sys import argv
 from math_strings import *
@@ -11,6 +11,7 @@ import random
 import stepfunction
 import transit_function
 import itertools as it
+import os
 
 def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, signpost=False):
 
@@ -46,7 +47,11 @@ def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, sign
 
         tf = transit_function.transit_function(transit_function=check_object, vertices=vertices)
 
-        ax_answer_true = tf.check_axioms(ax_choice_true, print_info=False)
+        if ax_choice_true == ["X"]:
+            ax_answer_true = [True]
+        else:
+            ax_answer_true = tf.check_axioms(ax_choice_true, print_info=False)
+
         if ax_choice_false == ["X"]:
             ax_answer_false = [False]
         else:
@@ -133,6 +138,18 @@ outdir = ""
 write_output = False
 random_function = False
 probabilities = []
+
+connected = False
+two_connected = False
+
+check_free_of = False
+forbidden_subgraphs = []
+subgraph_dir = ""
+
+check_contains = False
+induced_subgraphs = []
+induced_subgraph_dir = ""
+
 
 for arg in argv:
 
@@ -228,6 +245,31 @@ for arg in argv:
             outdir += "/"
         write_output = True
 
+    if arg in ["--connected"]:
+        connected = True
+
+    if arg in ["--2connected"]:
+        two_connected = True
+
+    if arg in ["--free"]:
+        check_free_of = True
+        try:
+            subgraph_dir = argv[argv.index(arg) + 1]
+            if subgraph_dir[-1] != "/":
+                subgraph_dir += "/"
+        except:
+            print("Please check the argument provided for the subgraph directory.")
+
+    if arg in ["--contains"]:
+        check_free_of = True
+        try:
+            induced_subgraph_dir = argv[argv.index(arg) + 1]
+            if induced_subgraph_dir[-1] != "/":
+                induced_subgraph_dir += "/"
+        except:
+            print("Please check the argument provided for the subgraph directory.")
+
+
 # Check if the axioms supplied are actually supported for signposts and exit otherwise
 if signpost:
     not_supported_axioms = []
@@ -244,6 +286,36 @@ if signpost:
                                                     "Please alter your axiom string.")
         sys.exit()
 
+    if check_free_of:
+        filenames = []
+        for path, subdirs, files in os.walk(subgraph_dir):
+            for name in files:
+                if ".tsv" in name:
+                    filenames += [os.path.join(path, name)]
+
+        for fpath in filenames:
+            with open(fpath, "r") as f:
+                csv_lines = f.read()
+                csv_lines = csv_lines.split("\n")
+
+            sf = stepfunction.stepfunction(csv_lines)
+            forbidden_subgraphs += [sf.get_graph()]
+
+    if check_contains:
+        filenames = []
+        for path, subdirs, files in os.walk(subgraph_dir):
+            for name in files:
+                if ".tsv" in name:
+                    filenames += [os.path.join(path, name)]
+
+        for fpath in filenames:
+            with open(fpath, "r") as f:
+                csv_lines = f.read()
+                csv_lines = csv_lines.split("\n")
+
+            sf = stepfunction.stepfunction(csv_lines)
+            induced_subgraphs += [sf.get_graph()]
+
 # Check if the axioms supplied are actually supported for DTF and exit otherwise
 if not signpost:
     not_supported_axioms = []
@@ -259,6 +331,21 @@ if not signpost:
         print("Axioms", sstr(not_supported_axioms), "are not supported for Directed Transit Functions. ",
               "Please alter your axiom string.")
         sys.exit()
+
+    if check_free_of:
+        filenames = []
+        for path, subdirs, files in os.walk(subgraph_dir):
+            for name in files:
+                if ".tsv" in name:
+                    filenames += [os.path.join(path, name)]
+
+        for fpath in subgraph_dir:
+            with open(fpath, "r") as f:
+                csv_lines = f.read()
+                csv_lines = csv_lines.split("\n")
+
+            tf = transit_function.transit_function(csv_lines=csv_lines)
+            forbidden_subgraphs += [tf.get_graph()]
 
 print(num_tries)
 
@@ -488,7 +575,7 @@ elif random_function:
 
                 if counter % 100 == 0:
                     print()
-                    print(counter, "graphs checked ...")
+                    print(counter, "functions checked ...")
 
                 counter += 1
 
@@ -542,7 +629,7 @@ elif random_function:
 
                 if counter % 100 == 0:
                     print()
-                    print(counter, "graphs checked ...")
+                    print(counter, "functions checked ...")
 
                 counter += 1
 
@@ -595,6 +682,39 @@ else:
     print("Checking all graphs up to 7 vertices.")
     print("-----------------------------------")
 
+    # sg = nx.Graph()
+    # sg.add_node(0)
+    # sg.add_node(1)
+    # sg.add_node(2)
+    # sg.add_node(3)
+    # sg.add_node(4)
+    #
+    # sg.add_edge(0, 2)
+    # sg.add_edge(0, 3)
+    # sg.add_edge(0, 4)
+    #
+    # sg.add_edge(1, 2)
+    # sg.add_edge(1, 3)
+    # sg.add_edge(1, 4)
+    #
+    # sg2 = nx.Graph()
+    # sg2.add_node(0)
+    # sg2.add_node(1)
+    # sg2.add_node(2)
+    # sg2.add_node(3)
+    # sg2.add_node(4)
+    #
+    # sg2.add_edge(0, 2)
+    # sg2.add_edge(0, 3)
+    # sg2.add_edge(0, 4)
+    #
+    # sg2.add_edge(1, 2)
+    # sg2.add_edge(1, 3)
+    # sg2.add_edge(1, 4)
+    #
+    # sg2.add_edge(0, 1)
+
+
     graph_atlas = nx.graph_atlas_g()
 
     if signpost:
@@ -603,14 +723,48 @@ else:
 
         for graph in graph_atlas:
 
-            if num_nodes != 0 and len(graph.nodes()) < num_nodes:
-                continue
-
             if counter % 100 == 0:
                 print()
                 print(counter, "graphs checked ...")
 
             counter += 1
+
+            if num_nodes != 0 and len(graph.nodes()) < num_nodes:
+                continue
+
+            if connected:
+                if nx.is_connected(graph):
+                    pass
+                else:
+                    continue
+
+            if two_connected:
+                if nx.is_biconnected(graph):
+                    pass
+                else:
+                    continue
+
+            if check_free_of:
+                is_free_of = True
+                for sg in forbidden_subgraphs:
+                    GM = isomorphism.GraphMatcher(graph, sg)
+                    res = GM.subgraph_is_isomorphic()
+                    if res:
+                        is_free_of = False
+                if not is_free_of:
+                    continue
+
+            if check_contains:
+                contains = False
+                for sg in forbidden_subgraphs:
+                    GM = isomorphism.GraphMatcher(graph, sg)
+                    res = GM.subgraph_is_isomorphic()
+                    if res:
+                        is_free_of = True
+                if contains:
+                    pass
+                else:
+                    continue
 
             vertices = list(graph.nodes())
 
@@ -640,6 +794,45 @@ else:
                 print(counter, "graphs checked ...")
 
             counter += 1
+
+
+            if num_nodes != 0 and len(graph.nodes()) < num_nodes:
+                continue
+
+            if connected:
+                if nx.is_connected(graph):
+                    pass
+                else:
+                    continue
+
+            if two_connected:
+                if nx.is_biconnected(graph):
+                    pass
+                else:
+                    continue
+
+            if check_free_of:
+                is_free_of = True
+                for sg in forbidden_subgraphs:
+                    GM = isomorphism.GraphMatcher(graph, sg)
+                    res = GM.subgraph_is_isomorphic()
+                    if res:
+                        is_free_of = False
+                if not is_free_of:
+                    continue
+
+            if check_contains:
+                contains = False
+                for sg in induced_subgraphs:
+                    GM = isomorphism.GraphMatcher(graph, sg)
+                    res = GM.subgraph_is_isomorphic()
+                    if res:
+                        is_free_of = True
+                if contains:
+                    pass
+                else:
+                    continue
+
 
             vertices = list(graph.nodes())
 

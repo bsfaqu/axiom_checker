@@ -555,6 +555,9 @@ class transit_function:
     def get_axioms(self):
         return self.axioms
 
+    def get_graph(self):
+        return self.graph
+
     def save_graph(self, csv_file):
         # Drawing graph figure and saving it
         nx.draw(self.graph, with_labels=True)

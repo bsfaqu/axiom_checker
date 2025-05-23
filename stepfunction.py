@@ -19,6 +19,8 @@ class stepfunction:
             # Parse vertices from the first line
             vertices = csv_lines[0].split("\t")[1::]
 
+            print("Stepfunction on vertices", vertices)
+
             # Remove the first line (only contains vertices)
             csv_lines = csv_lines[1::]
 
@@ -472,6 +474,9 @@ class stepfunction:
 
     def get_vertices(self):
         return self.vertices
+
+    def get_graph(self):
+        return self.graph
 
     def save_graph(self, csv_file):
         # Drawing graph figure and saving it
