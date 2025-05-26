@@ -15,29 +15,28 @@ import os
 
 def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, signpost=False):
 
+    # Signpost or no signpost flag
     if signpost:
 
+        # Create stepfunction from stepfunction set
         sf = stepfunction.stepfunction(stepfunction_set=check_object, vertices=vertices)
 
+        # Check if sat axioms dont matter
         if ax_choice_true == ["X"]:
             ax_answer_true = [True]
+        # Else we check the results for every axiom thats supposed to be sat
         else:
             ax_answer_true = sf.check_axioms(ax_choice_true, print_info=False)
 
-
+        # Check if sat axioms dont matter
         if ax_choice_false == ["X"]:
             ax_answer_false = [False]
+        # Else we check the results for every axiom thats supposed to be not sat
         else:
             ax_answer_false = sf.check_axioms(ax_choice_false, print_info=False)
 
-        # print("---")
-        # print(check_object)
-        # print("CHOICE SAT", ax_choice_sat)
-        # print("CHOICE VIO", ax_choice_not_sat)
-        # print("SAT?", ax_answer_true)
-        # print("VIO?", ax_answer_false)
-        # input()
-
+        # Check if instance satisfies constraints, i.e. if all pos axioms are satisfied and all neg
+        # axioms are not satisfied
         if False in ax_answer_true or True in ax_answer_false:
             return False
         else:
@@ -45,25 +44,25 @@ def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, sign
 
     else:
 
+        # Create transit function from transit function dic
         tf = transit_function.transit_function(transit_function=check_object, vertices=vertices)
 
+        # Check if sat axioms dont matter
         if ax_choice_true == ["X"]:
             ax_answer_true = [True]
+        # Else we check the results for every axiom thats supposed to be sat
         else:
             ax_answer_true = tf.check_axioms(ax_choice_true, print_info=False)
 
+        # Check if not sat axioms dont matter
         if ax_choice_false == ["X"]:
             ax_answer_false = [False]
+        # Else we check the results for every axiom thats supposed to be not sat
         else:
             ax_answer_false = tf.check_axioms(ax_choice_false, print_info=False)
 
-        # print("---")
-        # print(check_object)
-        # print("CHOICE SAT", ax_choice_sat)
-        # print("CHOICE VIO", ax_choice_not_sat)
-        # print("SAT?", ax_answer_true)
-        # print("VIO?", ax_answer_false)
-
+        # Check if instance satisfies constraints, i.e. if all pos axioms are satisfied and all neg
+        # axioms are not satisfied
         if False in ax_answer_true or True in ax_answer_false:
             return False
         else:
@@ -72,12 +71,18 @@ def check_instance(ax_choice_true, ax_choice_false, check_object, vertices, sign
 def get_random_digraph(num_nodes, edge_probability):
     edges = []
 
+    # randomly add edges to graph until there is at least one edge
     while len(edges) == 0:
+
+        # Init directed graph
         graph = nx.DiGraph()
 
+        # Add the vertices
         for i in range(0, num_nodes):
             graph.add_node(i)
 
+        # For each pair of vertices, randomly determine with edge_probabilty
+        # If they are connected with an edge
         for u in range(num_nodes):
             for v in range(num_nodes):
                 if u == v:
@@ -93,12 +98,17 @@ def get_random_digraph(num_nodes, edge_probability):
 def get_random_graph(num_nodes, edge_probability):
     edges = []
 
+    # randomly add edges to graph until there is at least one edge
     while len(edges) == 0:
+        # Init graph
         graph = nx.Graph()
 
+        # Add the vertices
         for i in range(0, num_nodes):
             graph.add_node(i)
 
+        # For each pair of vertices, randomly determine with edge_probabilty
+        # If they are connected with an edge
         for u in range(num_nodes):
             for v in range(u + 1, num_nodes):
                 if u == v:
@@ -111,6 +121,8 @@ def get_random_graph(num_nodes, edge_probability):
 
     return graph
 
+
+# Allowed transit function axioms
 axiom_strings_transit = [
             "t0", "t1", "t2s", "t2a", "t3",
             "tr2", "b1", "b2", "b3", "b4",
@@ -119,33 +131,52 @@ axiom_strings_transit = [
             "mod", "med", "b5", "rv", "ta", "graphic"
         ]
 
+# Allowed stepsytem axioms
 axiom_strings_stepfunctions = [
     "A", "B", "H", "C", "D", "F", "G", "E",
     "Pt", "Dd", "Dt", "Cw", "Cb", "Dm", "T1",
     "T2", "Tb2", "P4", "Sm", "graphic", "X"
 ]
 
+# Some flags for CLI input.
+# Signpost system or not
 signpost = False
+
+# Csv that contains a stepsystem/tf
 csv_file = ""
+
+# Axioms supplied
 ax_choice_sat = []
 ax_choice_not_sat = []
+
 wrong_file_choice = False
 no_file = True
+
+# Random graph mode?
 random_graphs = False
 num_nodes = 0
 num_tries = 0
+
+# Write output?
 outdir = ""
 write_output = False
+
+# Random Function Mode?
 random_function = False
+
+# Probabilities for random function or random_graph mode
 probabilities = []
 
+# Flags for connectedness filters
 connected = False
 two_connected = False
 
+# Forbidden subgraph flags
 check_free_of = False
 forbidden_subgraphs = []
 subgraph_dir = ""
 
+# Contains induced subgraph flags
 check_contains = False
 induced_subgraphs = []
 induced_subgraph_dir = ""
@@ -156,6 +187,25 @@ for arg in argv:
     # Print help string and exit if help argument was supplied
     if arg in ["-h", "--help", "--manual"]:
         print()
+        print("explore.py supports multiple modes. Please include the --signpost if you want to check"
+              "signpost systems.")
+        print("For every mode, the -s/--satisfies [axioms] or -v/--violates [axioms] flags have to be included.")
+        print("-s/--satisfies and -v/--violates have to be followed with a comma separated axiom string, e.g. 'b1,b5,tr2'.")
+        print()
+        print()
+        print("Iterate all undirected graphs <= 7 vertices:")
+        print("--------------------------------------------")
+        print()
+        print("This can be done with:")
+        print("python explore.py [--signpost] --satisfies [axioms] --violates [axioms].")
+        print("or")
+        print("python explore.py [--signpost] -s [axioms] -v [axioms].")
+        print()
+        print("Optional arguments include:")
+        print("-n [integer] / --nodes [integer] - For a minimum number of vertices.")
+        print("-o [directory] / --output [directory] - To write .png/.tsv of the generated examples to the directory.")
+        print("--connected - To filter for connected graphs")
+        print("--2connected - To filter for two-connected graphs")
         # print("Call check.py with:")
         # print("python check.py -a [axioms] -f [filename]")
         # print("or")
@@ -270,8 +320,10 @@ for arg in argv:
             print("Please check the argument provided for the subgraph directory.")
 
 
-# Check if the axioms supplied are actually supported for signposts and exit otherwise
+# Check input for signpost systems
 if signpost:
+
+    # Check if the axioms selected are supported
     not_supported_axioms = []
     for a in ax_choice_sat:
         if a not in axiom_strings_stepfunctions:
@@ -286,6 +338,7 @@ if signpost:
                                                     "Please alter your axiom string.")
         sys.exit()
 
+    # Read and save all forbidden subgraphs from the directory supplied
     if check_free_of:
         filenames = []
         for path, subdirs, files in os.walk(subgraph_dir):
@@ -301,6 +354,7 @@ if signpost:
             sf = stepfunction.stepfunction(csv_lines)
             forbidden_subgraphs += [sf.get_graph()]
 
+    # Read and save all induced subgraphs from the directory supplied
     if check_contains:
         filenames = []
         for path, subdirs, files in os.walk(subgraph_dir):
@@ -316,8 +370,11 @@ if signpost:
             sf = stepfunction.stepfunction(csv_lines)
             induced_subgraphs += [sf.get_graph()]
 
-# Check if the axioms supplied are actually supported for DTF and exit otherwise
+
+# Check input for (directed) transit functions
 if not signpost:
+
+    # Check if the axioms selected are supported
     not_supported_axioms = []
     for a in ax_choice_sat:
         if a not in axiom_strings_transit:
@@ -332,6 +389,7 @@ if not signpost:
               "Please alter your axiom string.")
         sys.exit()
 
+    # Read and save all forbidden subgraphs from the directory supplied
     if check_free_of:
         filenames = []
         for path, subdirs, files in os.walk(subgraph_dir):
@@ -347,10 +405,26 @@ if not signpost:
             tf = transit_function.transit_function(csv_lines=csv_lines)
             forbidden_subgraphs += [tf.get_graph()]
 
-print(num_tries)
+    # Read and save all induced subgraphs from the directory supplied
+    if check_contains:
+        filenames = []
+        for path, subdirs, files in os.walk(subgraph_dir):
+            for name in files:
+                if ".tsv" in name:
+                    filenames += [os.path.join(path, name)]
+
+        for fpath in filenames:
+            with open(fpath, "r") as f:
+                csv_lines = f.read()
+                csv_lines = csv_lines.split("\n")
+
+            tf = transit_function.transit_function(csv_lines=csv_lines)
+            induced_subgraphs += [tf.get_graph()]
+
 
 valid_graphs = 0
 
+# If adjacency mode is selected, i.e. an input file is supplied
 if not no_file:
 
     if signpost:
@@ -446,10 +520,6 @@ if not no_file:
 
             fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_test, vertices, signpost)
 
-            # print("Fits?", fits_axioms)
-            # if t_delete_0 == "*" and t_delete_1 == "*" and t_add_0 == "*" and t_add_1 == "*":
-            #     input()
-
             if fits_axioms:
                 print()
                 graph = step_to_graph(stepfunction_test)
@@ -464,6 +534,7 @@ if not no_file:
     else:
         pass
 
+# Random graph mode
 elif random_graphs:
     print("Checking Random Graphs with", num_nodes, "vertices.")
     print("-----------------------------------")
@@ -487,6 +558,42 @@ elif random_graphs:
                 counter += 1
 
                 graph = get_random_graph(num_nodes, edge_prob)
+
+                if connected:
+                    if nx.is_connected(graph):
+                        pass
+                    else:
+                        continue
+
+                if two_connected:
+                    if nx.is_biconnected(graph):
+                        pass
+                    else:
+                        continue
+
+                if check_free_of:
+                    is_free_of = True
+                    for sg in forbidden_subgraphs:
+                        GM = isomorphism.GraphMatcher(graph, sg)
+                        res = GM.subgraph_is_isomorphic()
+                        if res:
+                            is_free_of = False
+                    if not is_free_of:
+                        continue
+
+                if check_contains:
+                    contains = False
+                    for sg in forbidden_subgraphs:
+                        GM = isomorphism.GraphMatcher(graph, sg)
+                        res = GM.subgraph_is_isomorphic()
+                        if res:
+                            is_free_of = True
+                    if contains:
+                        pass
+                    else:
+                        continue
+
+
                 vertices = list(graph.nodes())
 
                 stepfunction_set = graph_to_step(graph)
@@ -521,6 +628,41 @@ elif random_graphs:
                 counter += 1
 
                 graph = get_random_digraph(num_nodes, edge_prob)
+
+                if connected:
+                    if nx.is_connected(graph):
+                        pass
+                    else:
+                        continue
+
+                if two_connected:
+                    if nx.is_biconnected(graph):
+                        pass
+                    else:
+                        continue
+
+                if check_free_of:
+                    is_free_of = True
+                    for sg in forbidden_subgraphs:
+                        GM = isomorphism.GraphMatcher(graph, sg)
+                        res = GM.subgraph_is_isomorphic()
+                        if res:
+                            is_free_of = False
+                    if not is_free_of:
+                        continue
+
+                if check_contains:
+                    contains = False
+                    for sg in forbidden_subgraphs:
+                        GM = isomorphism.GraphMatcher(graph, sg)
+                        res = GM.subgraph_is_isomorphic()
+                        if res:
+                            is_free_of = True
+                    if contains:
+                        pass
+                    else:
+                        continue
+
                 vertices = list(graph.nodes())
 
                 transit_function_test = graph_to_transit(graph)
@@ -533,7 +675,6 @@ elif random_graphs:
                 # print("FITS", fits_axioms)
                 # input()
 
-
                 if fits_axioms:
                     print()
                     print("Nodes:", sstr(vertices))
@@ -544,6 +685,7 @@ elif random_graphs:
                         save_transit_function(transit_function_test, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                     valid_graphs += 1
 
+# Random Function Mode
 elif random_function:
 
     print("Checking Random Functions on", num_nodes, "vertices.")
@@ -677,43 +819,11 @@ elif random_function:
                         save_transit_function(transit_function_dict_copy, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                     valid_graphs += 1
 
+# If no mode is chosen, iterate over all undirected graphs <= 7 vertices
 else:
 
     print("Checking all graphs up to 7 vertices.")
     print("-----------------------------------")
-
-    # sg = nx.Graph()
-    # sg.add_node(0)
-    # sg.add_node(1)
-    # sg.add_node(2)
-    # sg.add_node(3)
-    # sg.add_node(4)
-    #
-    # sg.add_edge(0, 2)
-    # sg.add_edge(0, 3)
-    # sg.add_edge(0, 4)
-    #
-    # sg.add_edge(1, 2)
-    # sg.add_edge(1, 3)
-    # sg.add_edge(1, 4)
-    #
-    # sg2 = nx.Graph()
-    # sg2.add_node(0)
-    # sg2.add_node(1)
-    # sg2.add_node(2)
-    # sg2.add_node(3)
-    # sg2.add_node(4)
-    #
-    # sg2.add_edge(0, 2)
-    # sg2.add_edge(0, 3)
-    # sg2.add_edge(0, 4)
-    #
-    # sg2.add_edge(1, 2)
-    # sg2.add_edge(1, 3)
-    # sg2.add_edge(1, 4)
-    #
-    # sg2.add_edge(0, 1)
-
 
     graph_atlas = nx.graph_atlas_g()
 

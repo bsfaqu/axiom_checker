@@ -13,13 +13,14 @@ class stepfunction:
     vertices = None
     axioms = None
 
-    def __init__(self, csv_lines=None, stepfunction_set=None, vertices=None):
+    def __init__(self, csv_lines=None, stepfunction_set=None, vertices=None, print_info=True):
 
         if csv_lines != None:
             # Parse vertices from the first line
             vertices = csv_lines[0].split("\t")[1::]
 
-            print("Stepfunction on vertices", vertices)
+            if print_info:
+                print("Stepfunction on vertices", vertices)
 
             # Remove the first line (only contains vertices)
             csv_lines = csv_lines[1::]
@@ -28,7 +29,7 @@ class stepfunction:
             stepfunction_dict = {}
 
             # Transit sets that are always supposed to be empty, i.e fields filled
-            # with "", hence no string
+            # with "", hence no strings
             ignore_tuples = []
 
             # Initialize transit sets as empty and ensure (t3)
@@ -81,13 +82,15 @@ class stepfunction:
             stepfunction_set = self.step_dic_to_set(stepfunction_dict)
 
             # Output supplied stepfunction
-            print("\n---\n")
-            print("*** Stepfunction before step-adding ***")
+            if print_info:
+                print("\n---\n")
+                print("*** Stepfunction before step-adding ***")
 
             counter = 0
 
-            for t in stepfunction_set:
-                print(tstr(t))
+            if print_info:
+                for t in stepfunction_set:
+                    print(tstr(t))
 
             # Save the original transit function
             orig_stepfunction_dict = copy.copy(stepfunction_dict)
@@ -105,9 +108,10 @@ class stepfunction:
                     graph.add_edge(t[0], t[1])
 
             # Output edges of G_R
-            print("\n---\n")
-            print("*** Constructed edges ***")
-            print(sstr(list(graph.edges())).replace("'", ""))
+            if print_info:
+                print("\n---\n")
+                print("*** Constructed edges ***")
+                print(sstr(list(graph.edges())).replace("'", ""))
 
             # Keep track of added paths
             added_paths = []
@@ -147,30 +151,35 @@ class stepfunction:
                     pass
 
             # output the added paths
-            for t in added_paths:
-                print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
+            if print_info:
+                for t in added_paths:
+                    print("Added path(s) for", str(t[0]).replace("'", ""), rarrow(), t[1].replace("'", ""))
 
-            if len(added_paths) > 0:
-                print()
+                if len(added_paths) > 0:
+                    print()
 
             # Output the transit function after adding the shortest paths in G_R
-            print("\n---\n")
-            print("*** Step Function after step-adding (as transit function) ***")
+            if print_info:
+                print("\n---\n")
+                print("*** Step Function after step-adding (as transit function) ***")
 
-            # Provide a structured output of the transit function
-            counter = 0
-            for k in stepfunction_dict:
-                if counter % len(vertices) == 0 and counter != 0:
-                    print("-")
-                print(r(k[0], k[1]), eq(), sstr(stepfunction_dict[k]))
-                counter += 1
+                # Provide a structured output of the transit function
+                counter = 0
+                for k in stepfunction_dict:
+                    if counter % len(vertices) == 0 and counter != 0:
+                        print("-")
+                    print(r(k[0], k[1]), eq(), sstr(stepfunction_dict[k]))
+                    counter += 1
 
-            print("\n---\n")
-            print("*** Step Function after step-adding (as set) ***")
+            if print_info:
+                print("\n---\n")
+                print("*** Step Function after step-adding (as set) ***")
 
             stepfunction_set = self.step_dic_to_set(stepfunction_dict)
-            for t in stepfunction_set:
-                print(tstr(t))
+
+            if print_info:
+                for t in stepfunction_set:
+                    print(tstr(t))
 
             # Store stetpfunction dict in class variable
             self.stepfunction_dict = stepfunction_dict
