@@ -187,10 +187,22 @@ for arg in argv:
     # Print help string and exit if help argument was supplied
     if arg in ["-h", "--help", "--manual"]:
         print()
-        print("explore.py supports multiple modes. Please include the --signpost if you want to check"
+        print("explore.py is a python command line utility to generate examples of directed transit functions and "
+              "signpost systems that satisfy a given set of axioms, and violate another set of given axioms.")
+        print()
+        print("explore.py supports multiple modes. Please include the --signpost if you want to check "
               "signpost systems.")
+        print()
         print("For every mode, the -s/--satisfies [axioms] or -v/--violates [axioms] flags have to be included.")
+        print("For every mode, explore ensures that the generated exampels satisfy the -s [axioms] and violate the"
+              " -v [axioms].")
+        print()
         print("-s/--satisfies and -v/--violates have to be followed with a comma separated axiom string, e.g. 'b1,b5,tr2'.")
+        print()
+        print("In case no axioms are required to be satisfied/violated, just an 'X' can be supplied, e.g. -s X or -v X.")
+        print()
+        print("Take note that 'graphic' can also be included as an axiom, for which is then checked if R_{G_R} = R "
+              "for directed transit functions, and the analogue for signpost systems.")
         print()
         print()
         print("Iterate all undirected graphs <= 7 vertices:")
@@ -198,14 +210,99 @@ for arg in argv:
         print()
         print("This can be done with:")
         print("python explore.py [--signpost] --satisfies [axioms] --violates [axioms].")
-        print("or")
+        print("OR")
         print("python explore.py [--signpost] -s [axioms] -v [axioms].")
+        print()
+        print("The --signpost flag is optional, hence should be used if you want to explore signpost systems.")
         print()
         print("Optional arguments include:")
         print("-n [integer] / --nodes [integer] - For a minimum number of vertices.")
         print("-o [directory] / --output [directory] - To write .png/.tsv of the generated examples to the directory.")
         print("--connected - To filter for connected graphs")
         print("--2connected - To filter for two-connected graphs")
+        print("--contains [directory] - To filter for graphs containing induced subgraphs.")
+        print("                         There should be .tsv files with transit functions/signpost systems that")
+        print("                         contain these induced subgraphs. File format should be the same as required for")
+        print("                         check.py. Can also be the output directory from another explore.py call.")
+        print("--free [directory]     - To filter for graphs NOT containing induced subgraphs.")
+        print("                         There should be .tsv files with transit functions/signpost systems that")
+        print("                         describe these forbidden subgraphs. File format should be the same as required for")
+        print("                         check.py. Can also be the output directory from another explore.py call.")
+
+        print()
+        print()
+        print("Generate random graphs (undirected for --signpost, directed for DTF)")
+        print("--------------------------------------------")
+        print()
+        print("This can be done with:")
+        print("python explore.py [--signpost] --satisfies [axioms] --violates [axioms] --randomgraph [num_tries] "
+              "--nodes [num_nodes] --probabilities [probabilitylist].")
+        print("OR")
+        print("python explore.py [--signpost] -s [axioms] -v [axioms] -rg [num_tries] -n [num_nodes] -p [probabilitylist].")
+        print()
+        print("The [probabilitylist] should be a comma-separated list of edge-probabilities. Make sure to not include any"
+              " spaces in this string. For example, '-p 0.1,0.2,0.3,0.9' is a valid probability string. ")
+        print()
+        print("The --signpost flag is optional, hence should be used if you want to explore signpost systems.")
+        print()
+        print("For example")
+        print("explore.py -s [sat_axioms] -v [viol_axioms] -rg 100 -n 5 -p 0.1,0.3,0.7 -o examples/")
+        print()
+        print("Randomly generates 100 graphs of 5 vertices with edge probability 10%, ...,  100 graphs of 5 vertices "
+              "with edge probability 70% and checks for each of them if they satisfy the axioms [sat_axioms] and violate"
+              " the [viol_axioms]. Graphs that satisfy [sat_axioms] and violate [viol_axioms] are saved to the examples/"
+              " directory in .tsv format (and their visualization as .png).")
+        print()
+        print("Optional arguments include:")
+        print("-o [directory] / --output [directory] - To write .png (figure) and .tsv of the generated examples to "
+              "the directory.")
+        print("--connected - To filter for connected graphs")
+        print("--2connected - To filter for two-connected graphs")
+        print("--contains [directory] - To filter for graphs containing induced subgraphs.")
+        print("                         There should be .tsv files with transit functions/signpost systems that")
+        print("                         contain these induced subgraphs. File format should be the same as required for")
+        print("                         check.py. Can also be the output directory from another explore.py call.")
+        print("--free [directory]     - To filter for graphs NOT containing induced subgraphs.")
+        print("                         There should be .tsv files with transit functions/signpost systems that")
+        print("                         describe these forbidden subgraphs. File format should be the same as required for")
+        print("                         check.py. Can also be the output directory from another explore.py call.")
+
+        print()
+        print()
+        print("Generate random functions")
+        print("--------------------------------------------")
+        print()
+        print("This can be done with:")
+        print("python explore.py [--signpost] --satisfies [axioms] --violates [axioms] --randomfunction [num_tries] "
+              "--nodes [num_nodes] --probabilities [probabilitylist].")
+        print("OR")
+        print(
+            "python explore.py [--signpost] -s [axioms] -v [axioms] -rf [num_tries] -n [num_nodes] -p [probabilitylist].")
+        print()
+        print(
+            "The [probabilitylist] should be a comma-separated list of edge-probabilities. Make sure to not include any "
+            "spaces in this string. For example, '-p 0.1,0.2,0.3,0.9' is a valid probability string. ")
+        print()
+        print("The --signpost flag is optional, hence should be used if you want to explore signpost systems.")
+        print()
+        print("For example,")
+        print("explore.py -s [sat_axioms] -v [viol_axioms] -rf 100 -n 5 -p 0.1,0.3,0.7 -o examples/")
+        print()
+        print("Randomly generates 100 directed transit functions on 5 vertices with the 'inclusion-probability 10%',"
+              " ..., 100 directed transit functions on 5 vertices with the 'inclusion-probability 70%'. Inclusion"
+              " probability here conceptually is that for every R(u,v), all remaining vertices are included in R(u,v)"
+              " with P(x in R(u,v))=0.1/0.3/0.7. The method for randomly creating these always ensures that u,v in R(u,v)"
+              " if R(u,v) is not empty. Similarly it ensures that u in R(u, u).")
+        print()
+        print("For signpost systems, the set of all possiple triples on [num_vertices] is computed and then 10%/.../70%"
+              " of these tuples are randomly selected and the signpost system is checked for the axioms.")
+        print()
+        print("Optional arguments include:")
+        print("-o [directory] / --output [directory] - To write .png (figure) and .tsv of the generated examples to "
+              "the directory.")
+        print()
+        print()
+
         # print("Call check.py with:")
         # print("python check.py -a [axioms] -f [filename]")
         # print("or")
@@ -219,6 +316,7 @@ for arg in argv:
         # print()
 
         print("Supported Axioms (Transit Functions):")
+        print("--------------------------------------------")
         for a in axiom_strings_transit:
             print_axiom_info_tf(a)
             print()
@@ -226,6 +324,7 @@ for arg in argv:
         print()
 
         print("Supported Axioms (Step functions):")
+        print("--------------------------------------------")
         for a in axiom_strings_stepfunctions:
             print_axiom_info_sf(a)
             print()
