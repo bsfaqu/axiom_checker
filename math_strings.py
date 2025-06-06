@@ -63,7 +63,7 @@ def r(u, v):
 def sstr(A):
     list_A = list(A)
     list_A = sorted(list_A)
-    if A == set():
+    if len(A) == 0:
         return emptyset()
     set_string = "{"
     for elem in A:
@@ -71,6 +71,19 @@ def sstr(A):
     set_string = set_string[0:-2]
     set_string += "}"
     return set_string
+
+def tstr(t):
+    tuple_string = "("
+    for e in t:
+        tuple_string += str(e) + ", "
+    tuple_string = tuple_string[0:-2] + ")"
+    return tuple_string
+
+def tp(u, v, w):
+    return tstr((u, v, w))
+
+def T():
+    return "T"
 
 
 # and string
@@ -107,7 +120,7 @@ def rarrow():
 def com():
     return ","
 
-def print_axiom_info(axiom):
+def print_axiom_info_tf(axiom):
     u = "u"
     v = "v"
     x = "x"
@@ -252,4 +265,97 @@ def print_axiom_info(axiom):
     if axiom == "b5":
         print("(b5) ", r(u, v), cap(), r(v, w), eq(), sstr({v}), implies(), r(u, v), cup(), r(v, w), subseteq(), r(u, w))
 
+def print_axiom_info_sf(axiom):
+    d = "d"
+    u = "u"
+    v = "v"
+    x = "x"
+    y = "y"
+    w = "w"
+    z = "z"
 
+    axiom_strings_stepfunctions = [
+        "A", "B", "H", "C", "D", "F", "G", "E",
+        "Pt", "Dd", "Dt", "Cw", "Cb", "Dm", "T1",
+        "T2", "Tb2", "P4", "Sm"
+    ]
+
+    if axiom == "A":
+        print("(A)", tp(u, v, x), elem(), T(), implies(), tp(v, u, u), elem(), T())
+
+    if axiom == "B":
+        print("(B)", tp(u, v, x), elem(), T(), implies(), tp(v, u, x), nelem(), T())
+
+    if axiom == "H":
+        print("(H)", u, neq(), v, implies(), exists(), x, "such that", tp(u, x, v), elem(), T())
+
+    if axiom == "C":
+        print("(C)", tp(u, v, x), elem(), T(), aand(), tp(x, y, v), elem(), T(),
+              implies(), tp(x, y, u), elem(), T())
+
+    if axiom == "D":
+        print("(D)", tp(u, v, x), elem(), T(), aand(), tp(x, y, v), elem(), T(),
+              implies(), tp(u, v, y), elem(), T())
+
+    if axiom == "F":
+        print("(F)", tp(u, v, x), elem(), T(), aand(), tp(v, u, y), aand(), tp(x, y, y), elem(), T(),
+              implies(), tp(x, y, u), elem(), T())
+
+    if axiom == "G":
+        print("(G)", tp(u, v, x), elem(), T(), aand(), tp(x, y, y), elem(), T(),
+              implies(), tp(x, y, y), elem(), T(),
+              oor(), tp(y, x, v), elem(), T(),
+              oor(), tp(u, v, y), elem(), T())
+
+    if axiom == "E":
+        print("(E)", tp(u, v, x), elem(), T(), aand(), tp(u, y, v), elem(), T(),
+              implies(), y, eq(), v)
+
+    if axiom == "Pt":
+        print("(B)", tp(u, v, x), elem(), T(), aand(), tp(v, x, y), elem(), T(),
+              implies(), tp(u, v, y), elem(), T())
+
+    if axiom == "Dd":
+        print("(Dd)", tp(x, d, v), elem(), T(), aand(), tp(u, d, v), elem(), T(),
+              tp(y, d, v), elem(), T(), aand(), tp(z, d, u), elem(), T(),
+              tp(v, d, u), elem(), T(), aand(), tp(w, d, u), elem(), T(),
+              implies(), tp(x, u, y), nelem(), T(), oor(), tp(z, v, w), nelem(), T())
+
+    if axiom == "Dt":
+        print("(Dt)", tp(x, u, v), elem(), T(), aand(), tp(y, u, v), elem(), T(), tp(z, u, v), elem(), T(),
+              implies(), tp(x, z, v), nelem(), T())
+
+    if axiom == "Cw":
+        print("(Cw)", tp(u, v, x), elem(), T(), aand(), tp(u, v, y), elem(), T(),
+              implies(), tp(x, y, v), nelem(), T())
+
+    if axiom == "Cb":
+        print("(Cb)", tp(u, x, v), elem(), T(), aand(), tp(u, y, w), elem(), T(),
+              aand(), tp(w, y, x), elem(), T(), aand(), tp(v, x, y), elem(), T(),
+              implies(), tp(x, u, y), elem(), T())
+
+    if axiom == "Dm":
+        print("(Dm)", tp(u, x, v), elem(), T(), aand(), tp(v, x, u), elem(), T(),
+              aand(), tp(u, y, v), elem(), T(), aand(), tp(v, y, u), elem(), T(),
+              implies(), tp(x, y, y), nelem(), T())
+
+    if axiom == "T1":
+        print("(T1)", x, neq(), y, implies(), exists() + "!", "t such that", tp(x, "t", y), elem(), T())
+
+    if axiom == "T2":
+        print("(T2)", tp(x, y, y), elem(), T(),
+              implies(), tp(x, y, z), elem(), T(), oor(), tp(y, x, z), elem(), T())
+
+    if axiom == "Tb2":
+        print("(Tb2)", tp(x, y, y), elem(), T(),
+              implies(), tp(x, y, z), elem(), T(), oor(), tp(y, x, z), elem(), T(),
+              oor(), exists(), "w", "such that", tp(x, "w", y), elem(), T(),
+              aand(), tp(x, "w", x), elem(), T())
+
+    if axiom == "P4":
+        print("(P4)", tp(u, x, y), elem(), T(), aand(), tp(x, y, v), elem(), T(),
+              implies(), tp(u, v, v), elem(), T())
+
+    if axiom == "Sm":
+        print("(Sm)", tp(v, w, x), elem(), T(), aand(), tp(v, w, z), elem(), T(), aand(), tp(x, y, z), elem(), T(),
+              implies(), tp(v, w, y), elem(), T())
