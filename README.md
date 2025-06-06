@@ -88,11 +88,15 @@ w       *       *       *
 This script reads a supplied .tsv file and checks it for a selected set of axioms. 
 Call it with 
 
+```python check.py --axioms [axioms] --filename [filename]```.
+
+OR
+
 ```python check.py -a [axioms] -f [filename]```.
 
 For example, checking the exampe above for axioms (b1), (b3), and (tr2) can be achieved by the following command:
 
-```python check.py b1,b3,tr2 example.tsv```.
+```python check.py -a b1,b3,tr2 -f example.tsv```.
 
 Take note that the axioms supplied as the second argument have to be separated by "," and cannot include spaces.
 
