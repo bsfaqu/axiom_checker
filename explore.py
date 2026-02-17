@@ -121,6 +121,52 @@ def get_random_graph(num_nodes, edge_probability):
 
     return graph
 
+def is_distance_hereditary(graph):
+    nodes = graph.nodes()
+
+    for u in nodes:
+        for v in nodes:
+            for w in nodes:
+                for x in nodes:
+                    try:
+                        d_uv = nx.shortest_path_length(graph, u, v)
+                    except:
+                        continue
+                        d_uv = -1
+                    try:
+                        d_wx = nx.shortest_path_length(graph, w, x)
+                    except:
+                        continue
+                        d_wx = -1
+                    try:
+                        d_uw = nx.shortest_path_length(graph, u, w)
+                    except:
+                        continue
+                        d_uw = -1
+                    try:
+                        d_vx = nx.shortest_path_length(graph, v, x)
+                    except:
+                        continue
+                        d_vx = -1
+                    try:
+                        continue
+                        d_ux = nx.shortest_path_length(graph, u, x)
+                    except:
+                        continue
+                        d_ux = -1
+                    try:
+                        continue
+                        d_vw = nx.shortest_path_length(graph, v, w)
+                    except:
+                        continue
+                        d_vw = -1
+
+                    distance_set = {d_uv + d_wx, d_uw + d_vx, d_ux + d_vw}
+
+                    if len(distance_set) > 2:
+                        return False
+    return True
+
 
 # Allowed transit function axioms
 axiom_strings_transit = [
@@ -180,6 +226,9 @@ subgraph_dir = ""
 check_contains = False
 induced_subgraphs = []
 induced_subgraph_dir = ""
+
+distance_hereditary = False
+distance_regular = False
 
 
 for arg in argv:
@@ -399,6 +448,12 @@ for arg in argv:
 
     if arg in ["--2connected"]:
         two_connected = True
+
+    if arg in ["--distancehereditary"]:
+        distance_hereditary = True
+
+    if arg in ["--distanceregular"]:
+        distance_regular = True
 
     if arg in ["--free"]:
         check_free_of = True
@@ -631,6 +686,7 @@ if not no_file:
                 valid_graphs += 1
 
     else:
+        # TODO implement the adjacency checking for the transit function
         pass
 
 # Random graph mode
@@ -641,6 +697,7 @@ elif random_graphs:
     if signpost:
 
         counter = 0
+        pass_filter = 0
 
         for edge_prob in probabilities:
 
@@ -652,7 +709,7 @@ elif random_graphs:
 
                 if counter % 100 == 0:
                     print()
-                    print(counter, "graphs checked ...")
+                    print(counter, "graphs checked ...", pass_filter, "passed filtering.")
 
                 counter += 1
 
@@ -670,6 +727,18 @@ elif random_graphs:
                     else:
                         continue
 
+                if distance_hereditary:
+                    if is_distance_hereditary(graph):
+                        pass
+                    else:
+                        continue
+
+                if distance_regular:
+                    if nx.is_distance_regular(graph):
+                        pass
+                    else:
+                        continue
+
                 if check_free_of:
                     is_free_of = True
                     for sg in forbidden_subgraphs:
@@ -692,6 +761,7 @@ elif random_graphs:
                     else:
                         continue
 
+                pass_filter += 1
 
                 vertices = list(graph.nodes())
 
@@ -699,7 +769,6 @@ elif random_graphs:
 
                 fits_axioms = check_instance(ax_choice_sat, ax_choice_not_sat, stepfunction_set, vertices, signpost)
 
-                # print("Fits?", fits_axioms)
 
                 if fits_axioms:
                     print()
@@ -707,11 +776,14 @@ elif random_graphs:
                     print("Edges:", sstr(list(graph.edges())))
                     print("Stepfunction:", sstr(stepfunction_set))
                     if write_output:
+                        save_step_function(stepfunction_set, outdir + "example_" + str(valid_graphs) + ".tsv", vertices)
                         save_graph(graph, outdir + "example_" + str(valid_graphs) + ".png")
                     valid_graphs += 1
 
     else:
+
         counter = 0
+        pass_filter = 0
 
         for edge_prob in probabilities:
             print()
@@ -722,7 +794,7 @@ elif random_graphs:
 
                 if counter % 100 == 0:
                     print()
-                    print(counter, "graphs checked ...")
+                    print(counter, "graphs checked ...", pass_filter, "passed filtering.")
 
                 counter += 1
 
@@ -740,6 +812,18 @@ elif random_graphs:
                     else:
                         continue
 
+                if distance_hereditary:
+                    if is_distance_hereditary(graph):
+                        pass
+                    else:
+                        continue
+
+                if distance_regular:
+                    if nx.is_distance_regular(graph):
+                        pass
+                    else:
+                        continue
+
                 if check_free_of:
                     is_free_of = True
                     for sg in forbidden_subgraphs:
@@ -761,6 +845,8 @@ elif random_graphs:
                         pass
                     else:
                         continue
+
+                pass_filter += 1
 
                 vertices = list(graph.nodes())
 
@@ -929,16 +1015,20 @@ else:
     if signpost:
 
         counter = 0
+        pass_filter = 0
 
         for graph in graph_atlas:
 
             if counter % 100 == 0:
                 print()
-                print(counter, "graphs checked ...")
+                print(counter, "graphs checked ...", pass_filter, "passed filtering.")
 
             counter += 1
 
             if num_nodes != 0 and len(graph.nodes()) < num_nodes:
+                continue
+
+            if len(graph.nodes()) == 0:
                 continue
 
             if connected:
@@ -949,6 +1039,18 @@ else:
 
             if two_connected:
                 if nx.is_biconnected(graph):
+                    pass
+                else:
+                    continue
+
+            if distance_hereditary:
+                if is_distance_hereditary(graph):
+                    pass
+                else:
+                    continue
+
+            if distance_regular:
+                if nx.is_distance_regular(graph):
                     pass
                 else:
                     continue
@@ -974,6 +1076,8 @@ else:
                     pass
                 else:
                     continue
+
+            pass_filter += 1
 
             vertices = list(graph.nodes())
 
@@ -995,17 +1099,20 @@ else:
     elif not signpost:
 
         counter = 0
+        pass_filter = 0
 
         for graph in graph_atlas:
 
             if counter % 100 == 0:
                 print()
-                print(counter, "graphs checked ...")
+                print(counter, "graphs checked ...", pass_filter, "passed filtering.")
 
             counter += 1
 
-
             if num_nodes != 0 and len(graph.nodes()) < num_nodes:
+                continue
+
+            if len(graph.nodes()) == 0:
                 continue
 
             if connected:
@@ -1016,6 +1123,18 @@ else:
 
             if two_connected:
                 if nx.is_biconnected(graph):
+                    pass
+                else:
+                    continue
+
+            if distance_hereditary:
+                if is_distance_hereditary(graph):
+                    pass
+                else:
+                    continue
+
+            if distance_regular:
+                if nx.is_distance_regular(graph):
                     pass
                 else:
                     continue
@@ -1032,7 +1151,7 @@ else:
 
             if check_contains:
                 contains = False
-                for sg in induced_subgraphs:
+                for sg in forbidden_subgraphs:
                     GM = isomorphism.GraphMatcher(graph, sg)
                     res = GM.subgraph_is_isomorphic()
                     if res:
@@ -1042,6 +1161,7 @@ else:
                 else:
                     continue
 
+            pass_filter += 1
 
             vertices = list(graph.nodes())
 
@@ -1065,6 +1185,14 @@ else:
 if signpost:
     print()
     print(valid_graphs, "explored step systems satisfied the constraints")
+    try:
+        print(pass_filter, "passed filtering.")
+    except:
+        pass
 elif not signpost:
     print()
     print(valid_graphs, "explored transit functions satisfied the constraints")
+    try:
+        print(pass_filter, "passed filtering.")
+    except:
+        pass
